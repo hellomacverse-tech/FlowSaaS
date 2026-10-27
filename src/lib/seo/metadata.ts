@@ -1,11 +1,20 @@
 import { Metadata } from 'next';
 
 interface MetadataProps {
-  title?: string;
-  description?: string;
-  image?: string;
-  noIndex?: boolean;
-  path?: string;
+  title?: string | { absolute: string; template?: string } | undefined;
+  description?: string | undefined;
+  image?: string | undefined;
+  noIndex?: boolean | undefined;
+  path?: string | undefined;
+  robots?: {
+    index?: boolean;
+    follow?: boolean;
+    googleBot?: {
+      index?: boolean;
+      follow?: boolean;
+      noimageindex?: boolean;
+    };
+  } | undefined;
 }
 
 export function constructMetadata({
@@ -14,6 +23,7 @@ export function constructMetadata({
   image = '/og-image.png',
   noIndex = false,
   path = '',
+  robots,
 }: MetadataProps = {}): Metadata {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://flowsaas.vercel.app';
   const url = `${baseUrl}${path}`;
@@ -22,16 +32,16 @@ export function constructMetadata({
     title,
     description,
     openGraph: {
-      title,
+      title: typeof title === 'string' ? title : title.absolute,
       description,
       url,
       siteName: 'FlowSaaS',
-      images: [{ url: image, width: 1200, height: 630, alt: title }],
+      images: [{ url: image, width: 1200, height: 630, alt: typeof title === 'string' ? title : title.absolute }],
       type: 'website',
     },
     twitter: {
       card: 'summary_large_image',
-      title,
+      title: typeof title === 'string' ? title : title.absolute,
       description,
       images: [image],
     },
@@ -41,6 +51,7 @@ export function constructMetadata({
         follow: false,
       },
     }),
+    ...(robots && { robots }),
   };
 }
 
