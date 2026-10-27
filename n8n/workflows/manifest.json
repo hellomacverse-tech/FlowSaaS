@@ -1,0 +1,86 @@
+[
+  {
+    "slug": "facebook-messenger-crm-google-sheets",
+    "file": "facebook-messenger-crm-google-sheets.json",
+    "version": "1.0.0",
+    "sha256": "45b779c7a25ad76e7aefcdd4987ac425115d9c85b9b4da98a0ec5966b4a32c2f",
+    "nodeCount": 11
+  },
+  {
+    "slug": "messenger-ai-sales-agent-orders",
+    "file": "messenger-ai-sales-agent-orders.json",
+    "version": "1.0.0",
+    "sha256": "84a32f66dfb71544e840485e22b6c1017105fbe46cb981844de5378ac862d592",
+    "nodeCount": 16
+  },
+  {
+    "slug": "facebook-comment-to-messenger-lead-tagger",
+    "file": "facebook-comment-to-messenger-lead-tagger.json",
+    "version": "1.0.0",
+    "sha256": "0671eceaffded783572ac4c6c475c57019c129ac6702863a2823dd3bb21ed11a",
+    "nodeCount": 12
+  },
+  {
+    "slug": "google-maps-lead-scraper-airtable",
+    "file": "google-maps-lead-scraper-airtable.json",
+    "version": "1.0.0",
+    "sha256": "37ec950dcb51609bbddb59d0e243257a22d82c477aff74b6465646ecf5297cdf",
+    "nodeCount": 13
+  },
+  {
+    "slug": "website-form-lead-enrichment-alerts",
+    "file": "website-form-lead-enrichment-alerts.json",
+    "version": "1.0.0",
+    "sha256": "1ba1f07b2e3aa464a3c6e0258ddf573dbe4a55231f62327c801a2b7a915feb0b",
+    "nodeCount": 9
+  },
+  {
+    "slug": "multi-channel-content-distributor",
+    "file": "multi-channel-content-distributor.json",
+    "version": "1.0.0",
+    "sha256": "94108855f467d497c00ac115423fdfd6d024d45449e236983298e3df26e05fc8",
+    "nodeCount": 15
+  },
+  {
+    "slug": "rss-to-ai-social-scheduler",
+    "file": "rss-to-ai-social-scheduler.json",
+    "version": "1.0.0",
+    "sha256": "41f8bc0e3bbbc639af3ea49bb02c292f29e06e2064000adf010c1bac6a34e8eb",
+    "nodeCount": 12
+  },
+  {
+    "slug": "shopify-order-telegram-fulfilment-sheet",
+    "file": "shopify-order-telegram-fulfilment-sheet.json",
+    "version": "1.0.0",
+    "sha256": "638efb503648388ca35b6c37e2a9f4cd98e41c59b1ae6139d7b7c4408460db47",
+    "nodeCount": 8
+  },
+  {
+    "slug": "abandoned-cart-recovery-messenger-email",
+    "file": "abandoned-cart-recovery-messenger-email.json",
+    "version": "1.0.0",
+    "sha256": "d640f2950f21aa905028bb16f16bb9415fd7993fcb7ca60f04a806eb7d568432",
+    "nodeCount": 14
+  },
+  {
+    "slug": "shopify-low-stock-supplier-reorder",
+    "file": "shopify-low-stock-supplier-reorder.json",
+    "version": "1.0.0",
+    "sha256": "c26dea4661dd16223bc902e41e4440c48d626d9f1909ad654bb88bd7a32d0b93",
+    "nodeCount": 9
+  },
+  {
+    "slug": "ai-support-ticket-triage",
+    "file": "ai-support-ticket-triage.json",
+    "version": "1.0.0",
+    "sha256": "df73d705f3f33f7ee820b70137bf45edab4406d0d20d4636fc3899ed13868247",
+    "nodeCount": 14
+  },
+  {
+    "slug": "telegram-ai-knowledge-bot-sheets",
+    "file": "telegram-ai-knowledge-bot-sheets.json",
+    "version": "1.0.0",
+    "sha256": "d873f5a3d59d124805d842b6768f779ab861288f75b335d775df9bbc726ffe13",
+    "nodeCount": 10
+  }
+]

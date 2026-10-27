@@ -1,0 +1,307 @@
+{
+  "name": "RSS to AI-Written Social Posts with Approval Queue (FlowSaaS v1.0.0)",
+  "nodes": [
+    {
+      "id": "4f245cc2-087f-7f3e-40d0-11c84c7e4c40",
+      "name": "FlowSaaS Setup",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -140
+      ],
+      "parameters": {
+        "content": "FlowSaaS v1.0.0 — setup guide: https://flowsaas.com/workflows/rss-to-ai-social-scheduler\n\nConnect your own credentials in each node marked with a warning icon. No credentials are included in this file.",
+        "height": 100,
+        "width": 460
+      }
+    },
+    {
+      "id": "055079fb-5f01-e324-8e44-7dac1b367d48",
+      "name": "RSS Feed Read",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [
+        56,
+        64
+      ],
+      "parameters": {},
+      "notes": "Polls the feed on a schedule for new items.",
+      "notesInFlow": false
+    },
+    {
+      "id": "0f2ce273-b0a1-8682-46d9-fdc0aaba08cf",
+      "name": "De-duplicate Items",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        364,
+        64
+      ],
+      "parameters": {},
+      "notes": "Skips items already processed in a prior run.",
+      "notesInFlow": false
+    },
+    {
+      "id": "de407c83-3d5e-af27-8328-c4395c62adf7",
+      "name": "Draft Social Post",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1,
+      "position": [
+        672,
+        64
+      ],
+      "parameters": {},
+      "notes": "Writes a social-ready post from the feed item. (needs: OpenAI API key)",
+      "notesInFlow": false
+    },
+    {
+      "id": "f63a3a6b-0596-1ba3-6060-ef5d44ccde7d",
+      "name": "Add to Approval Queue",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        979.9999999999999,
+        64
+      ],
+      "parameters": {},
+      "notes": "Appends the draft with a pending status. (needs: Google Sheets OAuth)",
+      "notesInFlow": false
+    },
+    {
+      "id": "c08f64cb-6ff8-489d-88f9-b5c0218bb044",
+      "name": "Notify Reviewer",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2,
+      "position": [
+        979.9999999999999,
+        224
+      ],
+      "parameters": {},
+      "notes": "Pings Slack that a new draft is ready to review. (needs: Slack webhook)",
+      "notesInFlow": false
+    },
+    {
+      "id": "d7df78fe-53b5-d3f0-9d84-5026f55cb284",
+      "name": "Poll for Approvals",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        672,
+        224
+      ],
+      "parameters": {},
+      "notes": "Checks the sheet for rows marked Approved. (needs: Google Sheets OAuth)",
+      "notesInFlow": false
+    },
+    {
+      "id": "7f0402dd-6a9d-d6e7-e003-756c9d3e1e05",
+      "name": "Mark as Published",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        364,
+        224
+      ],
+      "parameters": {},
+      "notes": "Updates the row's status once posted. (needs: Google Sheets OAuth)",
+      "notesInFlow": false
+    },
+    {
+      "id": "f54fcf39-3506-79c5-b005-c2778a18f21f",
+      "name": "Schedule Check",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        56,
+        224
+      ],
+      "parameters": {},
+      "notes": "Runs the approval-poll on a short interval.",
+      "notesInFlow": false
+    },
+    {
+      "id": "a30e0df9-ea97-b0e9-3272-1b1b4881358c",
+      "name": "Format for Posting",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        56,
+        384
+      ],
+      "parameters": {},
+      "notes": "Prepares the approved text for publishing.",
+      "notesInFlow": false
+    },
+    {
+      "id": "72633e70-916c-a667-66b7-2fd28be475d0",
+      "name": "Retry on Failure",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        364,
+        384
+      ],
+      "parameters": {},
+      "notes": "Retries a failed publish once.",
+      "notesInFlow": false
+    },
+    {
+      "id": "3963ce89-cbcf-3b6a-07ea-219e10b3da5b",
+      "name": "Publish Notification",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2,
+      "position": [
+        672,
+        384
+      ],
+      "parameters": {},
+      "notes": "Confirms in Slack once a post goes live. (needs: Slack webhook)",
+      "notesInFlow": false
+    },
+    {
+      "id": "5f6b3967-5e92-b041-9d03-de201362662c",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        979.9999999999999,
+        384
+      ],
+      "parameters": {},
+      "notes": "Logs failed drafts or publishes.",
+      "notesInFlow": false
+    }
+  ],
+  "connections": {
+    "RSS Feed Read": {
+      "main": [
+        [
+          {
+            "node": "De-duplicate Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "De-duplicate Items": {
+      "main": [
+        [
+          {
+            "node": "Draft Social Post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Draft Social Post": {
+      "main": [
+        [
+          {
+            "node": "Add to Approval Queue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add to Approval Queue": {
+      "main": [
+        [
+          {
+            "node": "Notify Reviewer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Reviewer": {
+      "main": [
+        [
+          {
+            "node": "Poll for Approvals",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Poll for Approvals": {
+      "main": [
+        [
+          {
+            "node": "Mark as Published",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark as Published": {
+      "main": [
+        [
+          {
+            "node": "Schedule Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Check": {
+      "main": [
+        [
+          {
+            "node": "Format for Posting",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format for Posting": {
+      "main": [
+        [
+          {
+            "node": "Retry on Failure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retry on Failure": {
+      "main": [
+        [
+          {
+            "node": "Publish Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publish Notification": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "flowsaasSlug": "rss-to-ai-social-scheduler",
+    "flowsaasVersion": "1.0.0"
+  }
+}

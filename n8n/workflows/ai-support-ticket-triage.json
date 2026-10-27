@@ -1,0 +1,355 @@
+{
+  "name": "AI Support Ticket Triage: OpenAI → Airtable → Telegram (FlowSaaS v1.0.0)",
+  "nodes": [
+    {
+      "id": "dfe528dc-f8ed-1848-7358-a877bf825a52",
+      "name": "FlowSaaS Setup",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -140
+      ],
+      "parameters": {
+        "content": "FlowSaaS v1.0.0 — setup guide: https://flowsaas.com/workflows/ai-support-ticket-triage\n\nConnect your own credentials in each node marked with a warning icon. No credentials are included in this file.",
+        "height": 100,
+        "width": 460
+      }
+    },
+    {
+      "id": "fa7fad30-071a-e32f-4ead-029cf4da9534",
+      "name": "Gmail Trigger",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1,
+      "position": [
+        56,
+        64
+      ],
+      "parameters": {},
+      "notes": "Watches the support inbox for new emails. (needs: Gmail OAuth)",
+      "notesInFlow": false
+    },
+    {
+      "id": "691ba76a-7be4-2674-749a-b5c282189a23",
+      "name": "Extract Email Body",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        364,
+        64
+      ],
+      "parameters": {},
+      "notes": "Cleans quoted text and signatures from the email body.",
+      "notesInFlow": false
+    },
+    {
+      "id": "8e0ff701-d027-b3bb-0ec2-d9c79d88578e",
+      "name": "Classify Ticket",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1,
+      "position": [
+        672,
+        64
+      ],
+      "parameters": {},
+      "notes": "Returns priority, category, and a one-line summary. (needs: OpenAI API key)",
+      "notesInFlow": false
+    },
+    {
+      "id": "bb06f2c8-e9a9-2a23-c0b0-859ca158d87b",
+      "name": "Find Existing Customer",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2,
+      "position": [
+        979.9999999999999,
+        64
+      ],
+      "parameters": {},
+      "notes": "Looks up the sender in your customer base. (needs: Airtable personal access token)",
+      "notesInFlow": false
+    },
+    {
+      "id": "3199b09e-3efe-bd98-d544-0f098d88ef77",
+      "name": "Create Ticket Record",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2,
+      "position": [
+        979.9999999999999,
+        224
+      ],
+      "parameters": {},
+      "notes": "Logs the ticket with priority and category. (needs: Airtable personal access token)",
+      "notesInFlow": false
+    },
+    {
+      "id": "90c6d167-6e94-04af-b41f-0bf5cafcef23",
+      "name": "Priority Filter",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        672,
+        224
+      ],
+      "parameters": {},
+      "notes": "Branches on High/Urgent priority tickets.",
+      "notesInFlow": false
+    },
+    {
+      "id": "8fb32693-4ad1-87a3-eca1-3ec379533c17",
+      "name": "Urgent Alert",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        364,
+        224
+      ],
+      "parameters": {},
+      "notes": "Pings the on-call channel for urgent tickets. (needs: Telegram bot token)",
+      "notesInFlow": false
+    },
+    {
+      "id": "fde371b0-77b3-b0ca-0c0b-e0802ce9b213",
+      "name": "Auto-Acknowledge",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [
+        56,
+        224
+      ],
+      "parameters": {},
+      "notes": "Sends a \"we got your message\" reply with an estimated response time. (needs: Gmail OAuth)",
+      "notesInFlow": false
+    },
+    {
+      "id": "75b5d7f0-0588-1a30-246b-c587bdd23f73",
+      "name": "Category Router",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        56,
+        384
+      ],
+      "parameters": {},
+      "notes": "Routes billing, technical, and general tickets differently.",
+      "notesInFlow": false
+    },
+    {
+      "id": "6af06cb1-c21e-b6e9-78b4-b7b15f9b7832",
+      "name": "Duplicate Detection",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        364,
+        384
+      ],
+      "parameters": {},
+      "notes": "Flags likely duplicate tickets from the same thread.",
+      "notesInFlow": false
+    },
+    {
+      "id": "73885157-6388-16dd-4359-b3f19d50fa9d",
+      "name": "SLA Timer Start",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        672,
+        384
+      ],
+      "parameters": {},
+      "notes": "Records the SLA clock start time on the ticket.",
+      "notesInFlow": false
+    },
+    {
+      "id": "1dca1c3f-387d-626d-69db-53a5f88dd954",
+      "name": "Sentiment Flag",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1,
+      "position": [
+        979.9999999999999,
+        384
+      ],
+      "parameters": {},
+      "notes": "Flags tickets with strongly negative sentiment for review. (needs: OpenAI API key)",
+      "notesInFlow": false
+    },
+    {
+      "id": "6eca8911-f51d-699b-6ae7-dc781743c8d9",
+      "name": "Escalation Alert",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        979.9999999999999,
+        544
+      ],
+      "parameters": {},
+      "notes": "Separately alerts on negative-sentiment tickets. (needs: Telegram bot token)",
+      "notesInFlow": false
+    },
+    {
+      "id": "387be9da-c28b-d8f9-d6df-e9c43506af47",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        672,
+        544
+      ],
+      "parameters": {},
+      "notes": "Logs classification or logging failures. (needs: Airtable personal access token)",
+      "notesInFlow": false
+    }
+  ],
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Extract Email Body",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Email Body": {
+      "main": [
+        [
+          {
+            "node": "Classify Ticket",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Classify Ticket": {
+      "main": [
+        [
+          {
+            "node": "Find Existing Customer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Existing Customer": {
+      "main": [
+        [
+          {
+            "node": "Create Ticket Record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Ticket Record": {
+      "main": [
+        [
+          {
+            "node": "Priority Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Priority Filter": {
+      "main": [
+        [
+          {
+            "node": "Urgent Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Urgent Alert": {
+      "main": [
+        [
+          {
+            "node": "Auto-Acknowledge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Auto-Acknowledge": {
+      "main": [
+        [
+          {
+            "node": "Category Router",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Category Router": {
+      "main": [
+        [
+          {
+            "node": "Duplicate Detection",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Duplicate Detection": {
+      "main": [
+        [
+          {
+            "node": "SLA Timer Start",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SLA Timer Start": {
+      "main": [
+        [
+          {
+            "node": "Sentiment Flag",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sentiment Flag": {
+      "main": [
+        [
+          {
+            "node": "Escalation Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Escalation Alert": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "flowsaasSlug": "ai-support-ticket-triage",
+    "flowsaasVersion": "1.0.0"
+  }
+}

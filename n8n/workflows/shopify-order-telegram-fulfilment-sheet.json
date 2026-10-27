@@ -1,0 +1,211 @@
+{
+  "name": "Shopify Order Alerts to Telegram & Google Sheets Fulfilment Tracker (FlowSaaS v1.0.0)",
+  "nodes": [
+    {
+      "id": "72bc9bd0-e822-c238-85d8-179e3eec5c2f",
+      "name": "FlowSaaS Setup",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -140
+      ],
+      "parameters": {
+        "content": "FlowSaaS v1.0.0 — setup guide: https://flowsaas.com/workflows/shopify-order-telegram-fulfilment-sheet\n\nConnect your own credentials in each node marked with a warning icon. No credentials are included in this file.",
+        "height": 100,
+        "width": 460
+      }
+    },
+    {
+      "id": "8c684596-4caf-00aa-1f4c-4e3fd37464ce",
+      "name": "Shopify Order Webhook",
+      "type": "n8n-nodes-base.shopifyTrigger",
+      "typeVersion": 1,
+      "position": [
+        56,
+        64
+      ],
+      "parameters": {},
+      "notes": "Fires on orders/create. (needs: Shopify Admin API access token)",
+      "notesInFlow": false
+    },
+    {
+      "id": "05b4dfb5-5eff-5479-1ade-6b3dab6c80f9",
+      "name": "Format Order Summary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        364,
+        64
+      ],
+      "parameters": {},
+      "notes": "Builds a readable summary of items and shipping address.",
+      "notesInFlow": false
+    },
+    {
+      "id": "9bfe5278-a790-c41a-bc5e-51a30aa6a194",
+      "name": "Telegram Alert",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        672,
+        64
+      ],
+      "parameters": {},
+      "notes": "Sends the order summary to your fulfilment channel. (needs: Telegram bot token)",
+      "notesInFlow": false
+    },
+    {
+      "id": "6e2cfcd6-0d09-8061-f7f0-c811fed75e7b",
+      "name": "Append Fulfilment Row",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        979.9999999999999,
+        64
+      ],
+      "parameters": {},
+      "notes": "Adds the order to the tracker with status \"New\". (needs: Google Sheets OAuth)",
+      "notesInFlow": false
+    },
+    {
+      "id": "b4a67601-0a56-84f1-6ded-0d08e8412bdd",
+      "name": "Paid Filter",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        979.9999999999999,
+        224
+      ],
+      "parameters": {},
+      "notes": "Branches on payment status.",
+      "notesInFlow": false
+    },
+    {
+      "id": "d795c9eb-fa70-ee9f-e733-15a39fa074a7",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        672,
+        224
+      ],
+      "parameters": {},
+      "notes": "Logs failed writes for review. (needs: Google Sheets OAuth)",
+      "notesInFlow": false
+    },
+    {
+      "id": "fcf93f4c-34ad-eaa7-9e41-0ab68713f19d",
+      "name": "Currency Formatter",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        364,
+        224
+      ],
+      "parameters": {},
+      "notes": "Formats order totals for the target locale.",
+      "notesInFlow": false
+    },
+    {
+      "id": "cf6397c8-0f72-0419-a775-e893e938539a",
+      "name": "Low-Stock Flag",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        56,
+        224
+      ],
+      "parameters": {},
+      "notes": "Flags line items now below a stock threshold.",
+      "notesInFlow": false
+    }
+  ],
+  "connections": {
+    "Shopify Order Webhook": {
+      "main": [
+        [
+          {
+            "node": "Format Order Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Order Summary": {
+      "main": [
+        [
+          {
+            "node": "Telegram Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Alert": {
+      "main": [
+        [
+          {
+            "node": "Append Fulfilment Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append Fulfilment Row": {
+      "main": [
+        [
+          {
+            "node": "Paid Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Paid Filter": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error Handler": {
+      "main": [
+        [
+          {
+            "node": "Currency Formatter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Currency Formatter": {
+      "main": [
+        [
+          {
+            "node": "Low-Stock Flag",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "flowsaasSlug": "shopify-order-telegram-fulfilment-sheet",
+    "flowsaasVersion": "1.0.0"
+  }
+}

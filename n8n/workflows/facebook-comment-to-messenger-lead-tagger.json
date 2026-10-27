@@ -1,0 +1,307 @@
+{
+  "name": "Facebook Page Comment-to-Messenger Auto Reply & Lead Tagging (FlowSaaS v1.0.0)",
+  "nodes": [
+    {
+      "id": "0a84a9ab-3006-33ba-326c-4b3dcc811b31",
+      "name": "FlowSaaS Setup",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -140
+      ],
+      "parameters": {
+        "content": "FlowSaaS v1.0.0 — setup guide: https://flowsaas.com/workflows/facebook-comment-to-messenger-lead-tagger\n\nConnect your own credentials in each node marked with a warning icon. No credentials are included in this file.",
+        "height": 100,
+        "width": 460
+      }
+    },
+    {
+      "id": "8d33f4e2-af11-f7de-0907-060c7c11b2ee",
+      "name": "Page Comment Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        56,
+        64
+      ],
+      "parameters": {},
+      "notes": "Receives new-comment events from the Graph API.",
+      "notesInFlow": false
+    },
+    {
+      "id": "131c51e1-aee9-c1de-1a45-99032d0507cd",
+      "name": "Verify Signature",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        364,
+        64
+      ],
+      "parameters": {},
+      "notes": "Validates the webhook signature.",
+      "notesInFlow": false
+    },
+    {
+      "id": "7941c9ba-1fc6-bce6-121a-48a77899e9d1",
+      "name": "Filter Own Comments",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        672,
+        64
+      ],
+      "parameters": {},
+      "notes": "Ignores comments made by the Page itself.",
+      "notesInFlow": false
+    },
+    {
+      "id": "b1bb36b3-4452-9832-4216-29ec5d98278d",
+      "name": "Classify Intent",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1,
+      "position": [
+        979.9999999999999,
+        64
+      ],
+      "parameters": {},
+      "notes": "Tags the comment as pricing, complaint, or general interest. (needs: OpenAI API key)",
+      "notesInFlow": false
+    },
+    {
+      "id": "b0e18244-1877-67ed-ad77-b7d639e6d3a8",
+      "name": "Private Reply",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        979.9999999999999,
+        224
+      ],
+      "parameters": {},
+      "notes": "Sends a private reply to the commenter via Messenger. (needs: Facebook Page access token)",
+      "notesInFlow": false
+    },
+    {
+      "id": "173505c5-82ab-9ac7-97f7-facf1d862bac",
+      "name": "Public Acknowledgement",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        672,
+        224
+      ],
+      "parameters": {},
+      "notes": "Posts a short public reply thanking the commenter. (needs: Facebook Page access token)",
+      "notesInFlow": false
+    },
+    {
+      "id": "6c67d5ea-ff9a-7efa-952c-7e435bc09664",
+      "name": "Find Existing Row",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        364,
+        224
+      ],
+      "parameters": {},
+      "notes": "Checks whether this commenter already has a row. (needs: Google Sheets OAuth)",
+      "notesInFlow": false
+    },
+    {
+      "id": "7f548b73-4a94-9476-11fb-edd6aaaabd94",
+      "name": "Upsert Lead Row",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        56,
+        224
+      ],
+      "parameters": {},
+      "notes": "Appends or updates the lead with its intent tag. (needs: Google Sheets OAuth)",
+      "notesInFlow": false
+    },
+    {
+      "id": "65730237-c3e6-a667-5f42-b4cdb588a93a",
+      "name": "High-Intent Filter",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        56,
+        384
+      ],
+      "parameters": {},
+      "notes": "Branches on pricing/purchase-intent comments.",
+      "notesInFlow": false
+    },
+    {
+      "id": "e7dde3c0-660e-d26e-51bf-dbd2f0464026",
+      "name": "Notify Team",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        364,
+        384
+      ],
+      "parameters": {},
+      "notes": "Alerts the team about high-intent comments. (needs: Telegram bot token)",
+      "notesInFlow": false
+    },
+    {
+      "id": "1132b726-da12-5f4c-a947-18490940c6ec",
+      "name": "Rate Limit Guard",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        672,
+        384
+      ],
+      "parameters": {},
+      "notes": "Avoids re-processing edited comments repeatedly.",
+      "notesInFlow": false
+    },
+    {
+      "id": "03ccd1d1-61bd-f43b-654d-ace0e939a48f",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        979.9999999999999,
+        384
+      ],
+      "parameters": {},
+      "notes": "Logs failed replies for review. (needs: Google Sheets OAuth)",
+      "notesInFlow": false
+    }
+  ],
+  "connections": {
+    "Page Comment Webhook": {
+      "main": [
+        [
+          {
+            "node": "Verify Signature",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verify Signature": {
+      "main": [
+        [
+          {
+            "node": "Filter Own Comments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Own Comments": {
+      "main": [
+        [
+          {
+            "node": "Classify Intent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Classify Intent": {
+      "main": [
+        [
+          {
+            "node": "Private Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Private Reply": {
+      "main": [
+        [
+          {
+            "node": "Public Acknowledgement",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Public Acknowledgement": {
+      "main": [
+        [
+          {
+            "node": "Find Existing Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Existing Row": {
+      "main": [
+        [
+          {
+            "node": "Upsert Lead Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upsert Lead Row": {
+      "main": [
+        [
+          {
+            "node": "High-Intent Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "High-Intent Filter": {
+      "main": [
+        [
+          {
+            "node": "Notify Team",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Team": {
+      "main": [
+        [
+          {
+            "node": "Rate Limit Guard",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rate Limit Guard": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "flowsaasSlug": "facebook-comment-to-messenger-lead-tagger",
+    "flowsaasVersion": "1.0.0"
+  }
+}

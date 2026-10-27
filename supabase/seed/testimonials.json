@@ -1,0 +1,68 @@
+[
+  {
+    "author_name": "Layla Hassan",
+    "author_role": "Founder",
+    "company": "Oasis Home Décor",
+    "quote": "We were copy-pasting Messenger leads into a spreadsheet every evening. Now they land in Sheets with intent and budget already tagged, and my team just follows up.",
+    "metric_label": null,
+    "metric_value": "−15 hrs/week",
+    "verified": false,
+    "is_seed": true,
+    "sort": 1
+  },
+  {
+    "author_name": "Marcus Webb",
+    "author_role": "Operations Lead",
+    "company": "Northbeam Studio",
+    "quote": "The setup video was so precise I imported the JSON and had it live before my coffee got cold.",
+    "metric_label": null,
+    "metric_value": "Live in 22 min",
+    "verified": false,
+    "is_seed": true,
+    "sort": 2
+  },
+  {
+    "author_name": "Priya Nair",
+    "author_role": "COO",
+    "company": "Kite & Co. Logistics",
+    "quote": "Their DFY team hardened our n8n server, deployed four workflows, and trained my staff in one week. Nothing has failed since.",
+    "metric_label": null,
+    "metric_value": "0 failed runs / 30 days",
+    "verified": false,
+    "is_seed": true,
+    "sort": 3
+  },
+  {
+    "author_name": "Tomás Rivera",
+    "author_role": "Head of Growth",
+    "company": "Brightline Apps",
+    "quote": "Caption Distributor turned one blog post into six channel-ready posts. It's the first automation my marketing team actually uses daily.",
+    "metric_label": null,
+    "metric_value": "−10 hrs/week",
+    "verified": false,
+    "is_seed": true,
+    "sort": 4
+  },
+  {
+    "author_name": "Sara Al-Mansoori",
+    "author_role": "Owner",
+    "company": "Nakheel Threads",
+    "quote": "Order alerts in Telegram and a live fulfilment sheet — my two-person shop finally feels organised.",
+    "metric_label": null,
+    "metric_value": "−7 hrs/week",
+    "verified": false,
+    "is_seed": true,
+    "sort": 5
+  },
+  {
+    "author_name": "Daniel Okafor",
+    "author_role": "CTO",
+    "company": "Meridian Health Ops",
+    "quote": "We passed our client's security questionnaire because FlowSaaS gave us encrypted credentials handling and full audit logs.",
+    "metric_label": null,
+    "metric_value": "Security review passed",
+    "verified": false,
+    "is_seed": true,
+    "sort": 6
+  }
+]

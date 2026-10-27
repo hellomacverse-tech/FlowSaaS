@@ -1,0 +1,259 @@
+{
+  "name": "Telegram AI Knowledge Bot Answering from Your Google Sheets FAQ (FlowSaaS v1.0.0)",
+  "nodes": [
+    {
+      "id": "6d28b767-286b-4404-877e-3d84f39fab08",
+      "name": "FlowSaaS Setup",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -140
+      ],
+      "parameters": {
+        "content": "FlowSaaS v1.0.0 — setup guide: https://flowsaas.com/workflows/telegram-ai-knowledge-bot-sheets\n\nConnect your own credentials in each node marked with a warning icon. No credentials are included in this file.",
+        "height": 100,
+        "width": 460
+      }
+    },
+    {
+      "id": "0676dd61-d44a-cb68-2d1b-c0d37b9734c2",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1,
+      "position": [
+        56,
+        64
+      ],
+      "parameters": {},
+      "notes": "Receives incoming messages to the bot. (needs: Telegram bot token)",
+      "notesInFlow": false
+    },
+    {
+      "id": "67cbdb9c-fe9c-a6cb-df5b-a96cfcb2229a",
+      "name": "Load FAQ Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        364,
+        64
+      ],
+      "parameters": {},
+      "notes": "Reads the current FAQ question/answer pairs. (needs: Google Sheets OAuth)",
+      "notesInFlow": false
+    },
+    {
+      "id": "4ff75fc5-04ee-3e72-e20d-37a0778ad733",
+      "name": "Find Best Match",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1,
+      "position": [
+        672,
+        64
+      ],
+      "parameters": {},
+      "notes": "Matches the question to the closest FAQ entry and paraphrases the answer. (needs: OpenAI API key)",
+      "notesInFlow": false
+    },
+    {
+      "id": "190a4111-cd97-291b-f671-883147910dca",
+      "name": "Confidence Check",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        979.9999999999999,
+        64
+      ],
+      "parameters": {},
+      "notes": "Branches when no FAQ entry is a close enough match.",
+      "notesInFlow": false
+    },
+    {
+      "id": "9fbd06c1-385f-c6be-392f-4e52e106a79e",
+      "name": "Send Answer",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        979.9999999999999,
+        224
+      ],
+      "parameters": {},
+      "notes": "Replies with the matched answer. (needs: Telegram bot token)",
+      "notesInFlow": false
+    },
+    {
+      "id": "2634747c-61d3-e24a-7814-d3973fdedc57",
+      "name": "Send Fallback",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        672,
+        224
+      ],
+      "parameters": {},
+      "notes": "Replies with a fallback message and a human-contact option. (needs: Telegram bot token)",
+      "notesInFlow": false
+    },
+    {
+      "id": "25ef793b-3f7f-0fba-36e7-871e462bdf47",
+      "name": "Log Unanswered Question",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        364,
+        224
+      ],
+      "parameters": {},
+      "notes": "Logs questions the bot couldn't confidently answer. (needs: Google Sheets OAuth)",
+      "notesInFlow": false
+    },
+    {
+      "id": "f9a0222e-9bd0-8353-fc90-02480f6f3742",
+      "name": "Cache Sheet Read",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        56,
+        224
+      ],
+      "parameters": {},
+      "notes": "Caches the FAQ sheet for a few minutes to reduce API calls.",
+      "notesInFlow": false
+    },
+    {
+      "id": "67a36bf6-dc70-fdf8-83c5-c0ff3c0d3f66",
+      "name": "Rate Limit Guard",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        56,
+        384
+      ],
+      "parameters": {},
+      "notes": "Caps replies per user per minute.",
+      "notesInFlow": false
+    },
+    {
+      "id": "75fc168e-f0c9-0241-14b5-b5f01bc756dd",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        364,
+        384
+      ],
+      "parameters": {},
+      "notes": "Logs failures reading the sheet or calling the AI. (needs: Google Sheets OAuth)",
+      "notesInFlow": false
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Load FAQ Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load FAQ Sheet": {
+      "main": [
+        [
+          {
+            "node": "Find Best Match",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Best Match": {
+      "main": [
+        [
+          {
+            "node": "Confidence Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Confidence Check": {
+      "main": [
+        [
+          {
+            "node": "Send Answer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Answer": {
+      "main": [
+        [
+          {
+            "node": "Send Fallback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Fallback": {
+      "main": [
+        [
+          {
+            "node": "Log Unanswered Question",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Unanswered Question": {
+      "main": [
+        [
+          {
+            "node": "Cache Sheet Read",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cache Sheet Read": {
+      "main": [
+        [
+          {
+            "node": "Rate Limit Guard",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rate Limit Guard": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "flowsaasSlug": "telegram-ai-knowledge-bot-sheets",
+    "flowsaasVersion": "1.0.0"
+  }
+}

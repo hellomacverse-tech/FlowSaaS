@@ -1,0 +1,379 @@
+{
+  "name": "Multi-Channel Content Distributor (Blog → LinkedIn, X, Facebook Page, Telegram) (FlowSaaS v1.0.0)",
+  "nodes": [
+    {
+      "id": "16999886-f099-a901-9249-4b05282ccc98",
+      "name": "FlowSaaS Setup",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -140
+      ],
+      "parameters": {
+        "content": "FlowSaaS v1.0.0 — setup guide: https://flowsaas.com/workflows/multi-channel-content-distributor\n\nConnect your own credentials in each node marked with a warning icon. No credentials are included in this file.",
+        "height": 100,
+        "width": 460
+      }
+    },
+    {
+      "id": "a6b04a50-04cc-8808-4e81-3386a99eb51f",
+      "name": "WordPress Trigger",
+      "type": "n8n-nodes-base.wordpress",
+      "typeVersion": 1,
+      "position": [
+        56,
+        64
+      ],
+      "parameters": {},
+      "notes": "Fires when a new post is published. (needs: WordPress application password)",
+      "notesInFlow": false
+    },
+    {
+      "id": "c510cbd0-dc8f-c387-e9ea-636a16de541c",
+      "name": "Fetch Full Post",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        364,
+        64
+      ],
+      "parameters": {},
+      "notes": "Pulls the full post content and featured image. (needs: WordPress application password)",
+      "notesInFlow": false
+    },
+    {
+      "id": "aaca041b-84c4-e87d-9b3a-cc2e50ff2e9c",
+      "name": "Adapt for LinkedIn",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1,
+      "position": [
+        672,
+        64
+      ],
+      "parameters": {},
+      "notes": "Rewrites the post as a LinkedIn-style update. (needs: OpenAI API key)",
+      "notesInFlow": false
+    },
+    {
+      "id": "2825aceb-8f7c-60ea-0a0c-807d5716ce54",
+      "name": "Adapt for X",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1,
+      "position": [
+        979.9999999999999,
+        64
+      ],
+      "parameters": {},
+      "notes": "Condenses the post into an X thread. (needs: OpenAI API key)",
+      "notesInFlow": false
+    },
+    {
+      "id": "f7ac83f6-fd34-1ab7-d785-ed09f4cf873d",
+      "name": "Adapt for Facebook",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1,
+      "position": [
+        979.9999999999999,
+        224
+      ],
+      "parameters": {},
+      "notes": "Rewrites the post for a Facebook Page audience. (needs: OpenAI API key)",
+      "notesInFlow": false
+    },
+    {
+      "id": "371eb6cd-6653-8735-cf4a-a9a4bb7ef6ce",
+      "name": "Adapt for Telegram",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1,
+      "position": [
+        672,
+        224
+      ],
+      "parameters": {},
+      "notes": "Writes a short Telegram announcement with a link. (needs: OpenAI API key)",
+      "notesInFlow": false
+    },
+    {
+      "id": "1acc6f87-5884-35e4-f8fa-05f985498d2e",
+      "name": "Publish to LinkedIn",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        364,
+        224
+      ],
+      "parameters": {},
+      "notes": "Posts the adapted update via the Marketing API. (needs: LinkedIn Marketing API access)",
+      "notesInFlow": false
+    },
+    {
+      "id": "615ad6e4-2930-7e51-5490-4c9e14805435",
+      "name": "Publish to X",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        56,
+        224
+      ],
+      "parameters": {},
+      "notes": "Posts the thread via the X API. (needs: X developer app)",
+      "notesInFlow": false
+    },
+    {
+      "id": "6b303cfd-4e3a-adee-299a-2a9f717afbb7",
+      "name": "Publish to Facebook Page",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        56,
+        384
+      ],
+      "parameters": {},
+      "notes": "Posts to the Page via the Graph API. (needs: Facebook Page access token)",
+      "notesInFlow": false
+    },
+    {
+      "id": "c4003497-e385-cede-b63a-aa8bdf5c25fa",
+      "name": "Publish to Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        364,
+        384
+      ],
+      "parameters": {},
+      "notes": "Sends the announcement to your channel. (needs: Telegram bot token)",
+      "notesInFlow": false
+    },
+    {
+      "id": "9b771273-1e63-a8d6-ec72-d4bdeed976a0",
+      "name": "Track Publish Results",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        672,
+        384
+      ],
+      "parameters": {},
+      "notes": "Collects success/failure per channel.",
+      "notesInFlow": false
+    },
+    {
+      "id": "ae192bb8-7168-692f-bf49-13e03b11827f",
+      "name": "Retry Failed Channel",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        979.9999999999999,
+        384
+      ],
+      "parameters": {},
+      "notes": "Retries a single channel once on failure.",
+      "notesInFlow": false
+    },
+    {
+      "id": "98dbd7ec-fac6-5f7f-c629-06c1dbfd711c",
+      "name": "Summary Notification",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2,
+      "position": [
+        979.9999999999999,
+        544
+      ],
+      "parameters": {},
+      "notes": "Posts a per-channel publish summary. (needs: Slack webhook)",
+      "notesInFlow": false
+    },
+    {
+      "id": "76e30569-df74-c391-5d19-a336fef7c75c",
+      "name": "Rate Limit Guard",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        672,
+        544
+      ],
+      "parameters": {},
+      "notes": "Spaces out API calls per channel's rate limit.",
+      "notesInFlow": false
+    },
+    {
+      "id": "5f98bea8-57da-f4d2-fd66-06b3270d38da",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        364,
+        544
+      ],
+      "parameters": {},
+      "notes": "Logs any channel that fails after retry.",
+      "notesInFlow": false
+    }
+  ],
+  "connections": {
+    "WordPress Trigger": {
+      "main": [
+        [
+          {
+            "node": "Fetch Full Post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Full Post": {
+      "main": [
+        [
+          {
+            "node": "Adapt for LinkedIn",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Adapt for LinkedIn": {
+      "main": [
+        [
+          {
+            "node": "Adapt for X",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Adapt for X": {
+      "main": [
+        [
+          {
+            "node": "Adapt for Facebook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Adapt for Facebook": {
+      "main": [
+        [
+          {
+            "node": "Adapt for Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Adapt for Telegram": {
+      "main": [
+        [
+          {
+            "node": "Publish to LinkedIn",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publish to LinkedIn": {
+      "main": [
+        [
+          {
+            "node": "Publish to X",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publish to X": {
+      "main": [
+        [
+          {
+            "node": "Publish to Facebook Page",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publish to Facebook Page": {
+      "main": [
+        [
+          {
+            "node": "Publish to Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publish to Telegram": {
+      "main": [
+        [
+          {
+            "node": "Track Publish Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Track Publish Results": {
+      "main": [
+        [
+          {
+            "node": "Retry Failed Channel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retry Failed Channel": {
+      "main": [
+        [
+          {
+            "node": "Summary Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summary Notification": {
+      "main": [
+        [
+          {
+            "node": "Rate Limit Guard",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rate Limit Guard": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "flowsaasSlug": "multi-channel-content-distributor",
+    "flowsaasVersion": "1.0.0"
+  }
+}

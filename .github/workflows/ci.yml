@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      # Dummy values so `src/lib/env.ts` validation passes in CI without
+      # real secrets. Never real credentials — CI only lints, typechecks,
+      # and unit-tests; it does not deploy or hit live services.
+      NEXT_PUBLIC_SITE_URL: https://flowsaas.example.com
+      NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-placeholder-anon-key
+      SUPABASE_SERVICE_ROLE_KEY: ci-placeholder-service-role-key
+      STRIPE_SECRET_KEY: sk_test_ci_placeholder
+      STRIPE_WEBHOOK_SECRET: whsec_ci_placeholder
+      STRIPE_PRICE_VIP_MONTHLY: price_ci_placeholder_monthly
+      STRIPE_PRICE_VIP_ANNUAL: price_ci_placeholder_annual
+      N8N_BASE_URL: https://n8n.example.com
+      N8N_WEBHOOK_SIGNING_SECRET: 00000000000000000000000000000000
+      N8N_SANDBOX_WEBHOOK_PATH: /webhook/flowsaas-sandbox
+      N8N_TOOLS_WEBHOOK_BASE: /webhook/tools
+      N8N_MODE: mock
+      ENCRYPTION_KEY_BASE64: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+      UPSTASH_REDIS_REST_URL: https://example.upstash.io
+      UPSTASH_REDIS_REST_TOKEN: ci-placeholder-token
+      NEXT_PUBLIC_TURNSTILE_SITE_KEY: ci-placeholder-site-key
+      TURNSTILE_SECRET_KEY: ci-placeholder-secret-key
+      RESEND_API_KEY: ci-placeholder-resend-key
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Generate + sanitize workflow files
+        run: |
+          pnpm generate:workflows
+          pnpm sanitize:workflows
+
+      - name: Unit tests
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build

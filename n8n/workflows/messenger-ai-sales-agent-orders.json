@@ -1,0 +1,403 @@
+{
+  "name": "Messenger AI Sales Agent with Order Capture (FlowSaaS v1.0.0)",
+  "nodes": [
+    {
+      "id": "761c794e-d1ad-99ae-6d9d-76de3fd3814e",
+      "name": "FlowSaaS Setup",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -140
+      ],
+      "parameters": {
+        "content": "FlowSaaS v1.0.0 — setup guide: https://flowsaas.com/workflows/messenger-ai-sales-agent-orders\n\nConnect your own credentials in each node marked with a warning icon. No credentials are included in this file.",
+        "height": 100,
+        "width": 460
+      }
+    },
+    {
+      "id": "0d43a2e4-75f9-4b25-331c-676e146f7cbb",
+      "name": "Messenger Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        56,
+        64
+      ],
+      "parameters": {},
+      "notes": "Receives Messenger events.",
+      "notesInFlow": false
+    },
+    {
+      "id": "8e1a4d66-e3f0-6405-e3b0-f3e7ed859587",
+      "name": "Verify Signature",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        364,
+        64
+      ],
+      "parameters": {},
+      "notes": "Validates the Meta webhook signature.",
+      "notesInFlow": false
+    },
+    {
+      "id": "0d25697a-bea7-7b24-62aa-ec39745a4697",
+      "name": "Load Conversation State",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2,
+      "position": [
+        672,
+        64
+      ],
+      "parameters": {},
+      "notes": "Fetches this PSID's conversation so far. (needs: Airtable personal access token)",
+      "notesInFlow": false
+    },
+    {
+      "id": "1f16f016-4e3a-ea64-5a8a-40736191ab44",
+      "name": "Load Product Catalog",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2,
+      "position": [
+        979.9999999999999,
+        64
+      ],
+      "parameters": {},
+      "notes": "Pulls current products, prices, and stock. (needs: Airtable personal access token)",
+      "notesInFlow": false
+    },
+    {
+      "id": "a72cb0e0-c13b-2f79-342b-fbf63c0b2e08",
+      "name": "AI Sales Agent",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1,
+      "position": [
+        979.9999999999999,
+        224
+      ],
+      "parameters": {},
+      "notes": "Answers questions and drives toward a confirmed order. (needs: OpenAI API key)",
+      "notesInFlow": false
+    },
+    {
+      "id": "f55a1d62-222c-fd63-6452-75a49b489dc0",
+      "name": "Detect Order Intent",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        672,
+        224
+      ],
+      "parameters": {},
+      "notes": "Branches when the agent detects a confirmed order.",
+      "notesInFlow": false
+    },
+    {
+      "id": "61afe9ee-b480-fb76-399a-d56960d88281",
+      "name": "Extract Order Fields",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1,
+      "position": [
+        364,
+        224
+      ],
+      "parameters": {},
+      "notes": "Structures the confirmed order into JSON. (needs: OpenAI API key)",
+      "notesInFlow": false
+    },
+    {
+      "id": "eb6b11e5-a52e-8aa7-42f9-6c17bcc15469",
+      "name": "Validate Stock",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        56,
+        224
+      ],
+      "parameters": {},
+      "notes": "Checks quantities against the catalog snapshot.",
+      "notesInFlow": false
+    },
+    {
+      "id": "28fc06a5-e2f6-42a6-dbcb-1fddca98e89c",
+      "name": "Create Order Record",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2,
+      "position": [
+        56,
+        384
+      ],
+      "parameters": {},
+      "notes": "Writes the order to the Orders table. (needs: Airtable personal access token)",
+      "notesInFlow": false
+    },
+    {
+      "id": "025eef7f-c5ba-4a2d-be39-101339be17a0",
+      "name": "Update Conversation State",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2,
+      "position": [
+        364,
+        384
+      ],
+      "parameters": {},
+      "notes": "Saves the updated conversation history. (needs: Airtable personal access token)",
+      "notesInFlow": false
+    },
+    {
+      "id": "96053b88-3585-43c5-2fd0-5c46af624f9b",
+      "name": "Send Reply",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        672,
+        384
+      ],
+      "parameters": {},
+      "notes": "Sends the agent's reply back to Messenger. (needs: Facebook Page access token)",
+      "notesInFlow": false
+    },
+    {
+      "id": "35c89b2f-0c39-2441-b1cd-3815416adbb1",
+      "name": "Notify Team",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        979.9999999999999,
+        384
+      ],
+      "parameters": {},
+      "notes": "Alerts the team when a new order is captured. (needs: Telegram bot token)",
+      "notesInFlow": false
+    },
+    {
+      "id": "eb13f189-affd-1300-574c-e276f91a9447",
+      "name": "Rate Limit Guard",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        979.9999999999999,
+        544
+      ],
+      "parameters": {},
+      "notes": "Caps AI calls per PSID per hour.",
+      "notesInFlow": false
+    },
+    {
+      "id": "213d51e6-eacc-910e-261c-4dd25ccd49ad",
+      "name": "Escalation Check",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        672,
+        544
+      ],
+      "parameters": {},
+      "notes": "Flags conversations the agent should hand off to a human.",
+      "notesInFlow": false
+    },
+    {
+      "id": "1b4ba7a9-4f3b-6816-ec81-12571bffc527",
+      "name": "Escalation Alert",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2,
+      "position": [
+        364,
+        544
+      ],
+      "parameters": {},
+      "notes": "Pings a human when escalation is needed. (needs: Slack webhook)",
+      "notesInFlow": false
+    },
+    {
+      "id": "299c90cc-8e04-f826-98a6-6a882b7eb465",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        56,
+        544
+      ],
+      "parameters": {},
+      "notes": "Logs failures for review. (needs: Airtable personal access token)",
+      "notesInFlow": false
+    }
+  ],
+  "connections": {
+    "Messenger Webhook": {
+      "main": [
+        [
+          {
+            "node": "Verify Signature",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verify Signature": {
+      "main": [
+        [
+          {
+            "node": "Load Conversation State",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load Conversation State": {
+      "main": [
+        [
+          {
+            "node": "Load Product Catalog",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load Product Catalog": {
+      "main": [
+        [
+          {
+            "node": "AI Sales Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Sales Agent": {
+      "main": [
+        [
+          {
+            "node": "Detect Order Intent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Detect Order Intent": {
+      "main": [
+        [
+          {
+            "node": "Extract Order Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Order Fields": {
+      "main": [
+        [
+          {
+            "node": "Validate Stock",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Stock": {
+      "main": [
+        [
+          {
+            "node": "Create Order Record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Order Record": {
+      "main": [
+        [
+          {
+            "node": "Update Conversation State",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Conversation State": {
+      "main": [
+        [
+          {
+            "node": "Send Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Reply": {
+      "main": [
+        [
+          {
+            "node": "Notify Team",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Team": {
+      "main": [
+        [
+          {
+            "node": "Rate Limit Guard",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rate Limit Guard": {
+      "main": [
+        [
+          {
+            "node": "Escalation Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Escalation Check": {
+      "main": [
+        [
+          {
+            "node": "Escalation Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Escalation Alert": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "flowsaasSlug": "messenger-ai-sales-agent-orders",
+    "flowsaasVersion": "1.0.0"
+  }
+}

@@ -1,0 +1,250 @@
+@import "tailwindcss";
+
+/* ==========================================================================
+   FlowSaaS design tokens — single source of truth (spec Section 3).
+   ========================================================================== */
+@theme {
+  --font-display: var(--font-plus-jakarta-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, monospace;
+
+  /* Neutrals */
+  --color-canvas: #ffffff;
+  --color-surface: #f8fafc; /* slate-50 */
+  --color-surface-2: #f1f5f9; /* slate-100 */
+  --color-line: #e2e8f0; /* slate-200 */
+  --color-ink: #0f172a; /* primary text */
+  --color-ink-2: #334155; /* secondary text (slate-700) */
+  --color-muted: #64748b; /* labels (slate-500) — 4.76:1 on white, OK for >=14px */
+
+  /* Coral (brand action) */
+  --color-coral-50: #fff1f1;
+  --color-coral-100: #ffe0e0;
+  --color-coral-300: #ffa3a3;
+  --color-coral-500: #ff6b6b; /* decorative / icons / large shapes ONLY */
+  --color-coral-600: #e5484d; /* text-safe + button-safe */
+  --color-coral-700: #c42b3d;
+
+  /* Teal (success / automation) */
+  --color-teal-50: #f0fdfa;
+  --color-teal-100: #ccfbf1;
+  --color-teal-300: #5eead4;
+  --color-teal-500: #14b8a6; /* decorative / icons / progress */
+  --color-teal-700: #0f766e; /* text-safe (5.5:1 on white) */
+
+  /* Soft Violet (AI) */
+  --color-violet-50: #f5f3ff;
+  --color-violet-100: #ede9fe;
+  --color-violet-300: #c4b5fd;
+  --color-violet-500: #8b5cf6; /* decorative / icons / progress */
+  --color-violet-600: #7c3aed; /* text-safe (5.7:1 on white) */
+
+  /* Semantic */
+  --color-warn: #f59e0b;
+  --color-danger: #dc2626;
+  --color-info: #0284c7;
+
+  /* Shadows */
+  --shadow-xs: 0 1px 2px rgb(15 23 42 / 0.04);
+  --shadow-sm: 0 1px 3px rgb(15 23 42 / 0.06), 0 1px 2px rgb(15 23 42 / 0.04);
+  --shadow-md: 0 8px 24px -6px rgb(15 23 42 / 0.1), 0 2px 6px rgb(15 23 42 / 0.04);
+  --shadow-glow-coral: 0 10px 30px -8px rgb(255 107 107 / 0.45);
+  --shadow-glow-teal: 0 10px 30px -8px rgb(20 184 166 / 0.35);
+
+  /* Motion durations / easing */
+  --ease-enter: cubic-bezier(0.22, 1, 0.36, 1);
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --duration-slow: 320ms;
+  --duration-enter: 600ms;
+
+  --breakpoint-sm: 40rem; /* 640 */
+  --breakpoint-md: 48rem; /* 768 */
+  --breakpoint-lg: 64rem; /* 1024 */
+  --breakpoint-xl: 80rem; /* 1280 */
+  --breakpoint-2xl: 96rem; /* 1536 */
+}
+
+/* Gradients (referenced as CSS vars, not Tailwind tokens, since a linear
+   gradient isn't a single color value @theme colors can hold). */
+:root {
+  --gradient-cta: linear-gradient(135deg, #e5484d 0%, #c42b3d 100%);
+  --gradient-cta-soft: linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 100%);
+  --gradient-flow: linear-gradient(90deg, #14b8a6 0%, #8b5cf6 100%);
+  --gradient-text: linear-gradient(90deg, #0f766e, #7c3aed);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+  }
+  ::selection {
+    background-color: var(--color-teal-100);
+    color: var(--color-ink);
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    background-image: var(--gradient-text);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+  }
+  .bg-gradient-cta {
+    background-image: var(--gradient-cta);
+  }
+  .bg-gradient-flow {
+    background-image: var(--gradient-flow);
+  }
+  .shadow-glow-coral {
+    box-shadow: var(--shadow-glow-coral);
+  }
+  .shadow-glow-teal {
+    box-shadow: var(--shadow-glow-teal);
+  }
+  .prose-measure {
+    max-width: 68ch;
+  }
+  .skip-link {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    z-index: 100;
+    background: var(--color-ink);
+    color: white;
+    padding: 0.75rem 1rem;
+    border-radius: 0 0 0.5rem 0;
+  }
+  .skip-link:focus {
+    left: 0;
+  }
+}
+
+/* Fluid type scale (Section 3.4) */
+.text-h1 {
+  font-size: clamp(2.25rem, 1.4rem + 3.6vw, 4rem);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  font-weight: 800;
+}
+.text-h2 {
+  font-size: clamp(1.75rem, 1.2rem + 2vw, 2.75rem);
+  line-height: 1.1;
+  font-weight: 700;
+}
+.text-h3 {
+  font-size: clamp(1.25rem, 1rem + 0.8vw, 1.5rem);
+  font-weight: 600;
+}
+.text-caption {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* Decorative gradient sphere float keyframes (Section 3.6) */
+@keyframes float-a {
+  from {
+    transform: translate(0, 0) scale(1);
+  }
+  to {
+    transform: translate(-24px, 16px) scale(1.06);
+  }
+}
+@keyframes float-b {
+  from {
+    transform: translate(0, 0) scale(1);
+  }
+  to {
+    transform: translate(20px, -18px) scale(1.06);
+  }
+}
+@keyframes float-c {
+  from {
+    transform: translate(0, 0) scale(1);
+  }
+  to {
+    transform: translate(-16px, -20px) scale(1.05);
+  }
+}
+
+/* Dashed connector flow animation for HeroFlowVisual (Section 9.1.1) */
+@keyframes dash {
+  to {
+    stroke-dashoffset: -24;
+  }
+}
+
+/* Shimmer for Skeletons (Section 3.7) */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+.animate-shimmer {
+  background-image: linear-gradient(
+    90deg,
+    var(--color-surface-2) 0%,
+    #ffffff 50%,
+    var(--color-surface-2) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+/* Slider thumb styling (Section 9.6): 24px white thumb, shadow-md, no
+   native track styling (the track's gradient fill is set inline per-value
+   by the Slider component). */
+.slider-track {
+  -webkit-appearance: none;
+  appearance: none;
+}
+.slider-track::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 9999px;
+  background: #ffffff;
+  border: 1px solid var(--color-line);
+  box-shadow: var(--shadow-md);
+  cursor: pointer;
+}
+.slider-track::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 9999px;
+  background: #ffffff;
+  border: 1px solid var(--color-line);
+  box-shadow: var(--shadow-md);
+  cursor: pointer;
+}
+.slider-track::-moz-range-track {
+  background: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

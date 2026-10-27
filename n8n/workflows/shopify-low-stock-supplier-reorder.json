@@ -1,0 +1,235 @@
+{
+  "name": "Shopify Low-Stock Alerts & Supplier Reorder Email Drafts (FlowSaaS v1.0.0)",
+  "nodes": [
+    {
+      "id": "d32d81a7-237b-8548-2b93-ed0a0db71bf1",
+      "name": "FlowSaaS Setup",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -140
+      ],
+      "parameters": {
+        "content": "FlowSaaS v1.0.0 — setup guide: https://flowsaas.com/workflows/shopify-low-stock-supplier-reorder\n\nConnect your own credentials in each node marked with a warning icon. No credentials are included in this file.",
+        "height": 100,
+        "width": 460
+      }
+    },
+    {
+      "id": "d9bcb2cd-a6ff-0a74-c375-2117633e3778",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        56,
+        64
+      ],
+      "parameters": {},
+      "notes": "Runs the stock check daily.",
+      "notesInFlow": false
+    },
+    {
+      "id": "7c3cbfd0-7b78-24a4-cc5a-885e349bc2db",
+      "name": "Fetch Inventory Levels",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        364,
+        64
+      ],
+      "parameters": {},
+      "notes": "Pulls current stock for all tracked SKUs. (needs: Shopify Admin API access token)",
+      "notesInFlow": false
+    },
+    {
+      "id": "541045a5-9b8a-cab7-5eb7-d127212ad49a",
+      "name": "Filter Below Threshold",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        672,
+        64
+      ],
+      "parameters": {},
+      "notes": "Keeps only SKUs under their reorder point.",
+      "notesInFlow": false
+    },
+    {
+      "id": "74fdd833-98d5-0c0f-cb7f-cd0ef965ff33",
+      "name": "Look Up Supplier",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        979.9999999999999,
+        64
+      ],
+      "parameters": {},
+      "notes": "Matches each SKU to its supplier and contact email. (needs: Google Sheets OAuth)",
+      "notesInFlow": false
+    },
+    {
+      "id": "50ff56b5-2c7d-e9f4-1154-8aee29fd82f0",
+      "name": "Log Low-Stock Item",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        979.9999999999999,
+        224
+      ],
+      "parameters": {},
+      "notes": "Appends the item to the low-stock tracker. (needs: Google Sheets OAuth)",
+      "notesInFlow": false
+    },
+    {
+      "id": "eb0c8bd0-faf2-b8ad-85bb-201bdeff9032",
+      "name": "Draft Reorder Email",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1,
+      "position": [
+        672,
+        224
+      ],
+      "parameters": {},
+      "notes": "Writes a ready-to-send reorder request per supplier. (needs: OpenAI API key)",
+      "notesInFlow": false
+    },
+    {
+      "id": "76697676-1a3c-7f6e-efdb-074886e97c89",
+      "name": "Create Gmail Draft",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [
+        364,
+        224
+      ],
+      "parameters": {},
+      "notes": "Saves the reorder email as a draft (not sent automatically). (needs: Gmail OAuth)",
+      "notesInFlow": false
+    },
+    {
+      "id": "8054ac26-b865-741f-7292-775bef3ca11e",
+      "name": "Group by Supplier",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        56,
+        224
+      ],
+      "parameters": {},
+      "notes": "Batches multiple low-stock SKUs into one email per supplier.",
+      "notesInFlow": false
+    },
+    {
+      "id": "305648ae-5c50-096a-b1fb-ee164c53ceca",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        56,
+        384
+      ],
+      "parameters": {},
+      "notes": "Logs failures reading inventory or drafting email. (needs: Google Sheets OAuth)",
+      "notesInFlow": false
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Fetch Inventory Levels",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Inventory Levels": {
+      "main": [
+        [
+          {
+            "node": "Filter Below Threshold",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Below Threshold": {
+      "main": [
+        [
+          {
+            "node": "Look Up Supplier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Look Up Supplier": {
+      "main": [
+        [
+          {
+            "node": "Log Low-Stock Item",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Low-Stock Item": {
+      "main": [
+        [
+          {
+            "node": "Draft Reorder Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Draft Reorder Email": {
+      "main": [
+        [
+          {
+            "node": "Create Gmail Draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Gmail Draft": {
+      "main": [
+        [
+          {
+            "node": "Group by Supplier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Group by Supplier": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "flowsaasSlug": "shopify-low-stock-supplier-reorder",
+    "flowsaasVersion": "1.0.0"
+  }
+}

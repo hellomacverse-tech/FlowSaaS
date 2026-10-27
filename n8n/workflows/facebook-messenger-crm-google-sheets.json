@@ -1,0 +1,283 @@
+{
+  "name": "Facebook Messenger CRM Lead Capture & Google Sheets Sync (FlowSaaS v1.0.0)",
+  "nodes": [
+    {
+      "id": "657c7fac-f25f-ab71-2763-bb58222c34fd",
+      "name": "FlowSaaS Setup",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -140
+      ],
+      "parameters": {
+        "content": "FlowSaaS v1.0.0 — setup guide: https://flowsaas.com/workflows/facebook-messenger-crm-google-sheets\n\nConnect your own credentials in each node marked with a warning icon. No credentials are included in this file.",
+        "height": 100,
+        "width": 460
+      }
+    },
+    {
+      "id": "3aae02a7-abec-8be2-9100-995fe86dbfbc",
+      "name": "Messenger Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        56,
+        64
+      ],
+      "parameters": {},
+      "notes": "Receives Meta events and the GET verification challenge.",
+      "notesInFlow": false
+    },
+    {
+      "id": "f7baa921-af21-100d-dd73-9fafce172565",
+      "name": "Verify Signature",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        364,
+        64
+      ],
+      "parameters": {},
+      "notes": "Validates X-Hub-Signature-256 with your app secret.",
+      "notesInFlow": false
+    },
+    {
+      "id": "2942d8b5-529a-0c94-8ce9-5e03959c9f19",
+      "name": "Filter Message Events",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        672,
+        64
+      ],
+      "parameters": {},
+      "notes": "Passes only user text messages.",
+      "notesInFlow": false
+    },
+    {
+      "id": "0c7de271-2b1c-b274-e3f4-e80e8ed05777",
+      "name": "Get User Profile",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        979.9999999999999,
+        64
+      ],
+      "parameters": {},
+      "notes": "Fetches first/last name from the Graph API. (needs: Facebook Page access token)",
+      "notesInFlow": false
+    },
+    {
+      "id": "11142a8c-0707-25d8-fa2e-1ac35bca0b64",
+      "name": "Extract Intent & Fields",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1,
+      "position": [
+        979.9999999999999,
+        224
+      ],
+      "parameters": {},
+      "notes": "Returns JSON {intent, budget, phone, email, language}. (needs: OpenAI API key)",
+      "notesInFlow": false
+    },
+    {
+      "id": "7e9b380c-50f6-9019-3bf7-d5a78cf1c1a7",
+      "name": "Score Lead",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        672,
+        224
+      ],
+      "parameters": {},
+      "notes": "0–100 score from intent + budget + contact completeness.",
+      "notesInFlow": false
+    },
+    {
+      "id": "3f79a7e2-3744-37fe-3a64-b96713a0e324",
+      "name": "Find Existing Lead",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        364,
+        224
+      ],
+      "parameters": {},
+      "notes": "Looks up the row by PSID. (needs: Google Sheets OAuth)",
+      "notesInFlow": false
+    },
+    {
+      "id": "4c06bd76-20e2-65d7-7b11-1d3747780540",
+      "name": "Upsert Lead Row",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        56,
+        224
+      ],
+      "parameters": {},
+      "notes": "Appends or updates the lead row. (needs: Google Sheets OAuth)",
+      "notesInFlow": false
+    },
+    {
+      "id": "fbc33e0a-6060-7d84-bfce-730b1659b5e7",
+      "name": "Send Reply",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        56,
+        384
+      ],
+      "parameters": {},
+      "notes": "Sends a templated reply by intent, within the 24-hour window. (needs: Facebook Page access token)",
+      "notesInFlow": false
+    },
+    {
+      "id": "da96c880-3532-1ad2-17b1-1ae77a0d76d4",
+      "name": "Notify Team",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        364,
+        384
+      ],
+      "parameters": {},
+      "notes": "Alerts the team for hot leads (score ≥ 70). (needs: Telegram bot token)",
+      "notesInFlow": false
+    },
+    {
+      "id": "75807c0d-0e41-7ba4-0dd1-0fa37555259a",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        672,
+        384
+      ],
+      "parameters": {},
+      "notes": "Logs failures to an Errors sheet. (needs: Google Sheets OAuth)",
+      "notesInFlow": false
+    }
+  ],
+  "connections": {
+    "Messenger Webhook": {
+      "main": [
+        [
+          {
+            "node": "Verify Signature",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verify Signature": {
+      "main": [
+        [
+          {
+            "node": "Filter Message Events",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Message Events": {
+      "main": [
+        [
+          {
+            "node": "Get User Profile",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get User Profile": {
+      "main": [
+        [
+          {
+            "node": "Extract Intent & Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Intent & Fields": {
+      "main": [
+        [
+          {
+            "node": "Score Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Score Lead": {
+      "main": [
+        [
+          {
+            "node": "Find Existing Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Existing Lead": {
+      "main": [
+        [
+          {
+            "node": "Upsert Lead Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upsert Lead Row": {
+      "main": [
+        [
+          {
+            "node": "Send Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Reply": {
+      "main": [
+        [
+          {
+            "node": "Notify Team",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Team": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "flowsaasSlug": "facebook-messenger-crm-google-sheets",
+    "flowsaasVersion": "1.0.0"
+  }
+}

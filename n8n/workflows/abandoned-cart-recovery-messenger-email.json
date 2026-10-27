@@ -1,0 +1,355 @@
+{
+  "name": "Abandoned Cart Recovery via Messenger (opt-in) & Email (FlowSaaS v1.0.0)",
+  "nodes": [
+    {
+      "id": "34c976eb-24af-d57a-2b93-6816360da28e",
+      "name": "FlowSaaS Setup",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -140
+      ],
+      "parameters": {
+        "content": "FlowSaaS v1.0.0 — setup guide: https://flowsaas.com/workflows/abandoned-cart-recovery-messenger-email\n\nConnect your own credentials in each node marked with a warning icon. No credentials are included in this file.",
+        "height": 100,
+        "width": 460
+      }
+    },
+    {
+      "id": "267994bf-ba07-6b8e-eebd-033e7d145095",
+      "name": "Checkout Abandoned Webhook",
+      "type": "n8n-nodes-base.shopifyTrigger",
+      "typeVersion": 1,
+      "position": [
+        56,
+        64
+      ],
+      "parameters": {},
+      "notes": "Fires on checkouts/create without a matching order. (needs: Shopify Admin API access token)",
+      "notesInFlow": false
+    },
+    {
+      "id": "7695858f-f141-7a66-46ac-31d01dfffcac",
+      "name": "Wait (Recovery Delay)",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [
+        364,
+        64
+      ],
+      "parameters": {},
+      "notes": "Pauses before the first nudge (default 1 hour).",
+      "notesInFlow": false
+    },
+    {
+      "id": "5872099c-1f31-8125-c83d-dcff474fb015",
+      "name": "Check Order Completed",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        672,
+        64
+      ],
+      "parameters": {},
+      "notes": "Confirms the cart wasn't completed while waiting. (needs: Shopify Admin API access token)",
+      "notesInFlow": false
+    },
+    {
+      "id": "b292ec6b-2620-d7e1-2951-caa7fee8a3d4",
+      "name": "Messenger Opt-in Check",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2,
+      "position": [
+        979.9999999999999,
+        64
+      ],
+      "parameters": {},
+      "notes": "Checks whether this customer has an active Messenger opt-in. (needs: Airtable personal access token)",
+      "notesInFlow": false
+    },
+    {
+      "id": "f82f96a6-6760-156d-3659-4f463dce872a",
+      "name": "Send Messenger Nudge",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        979.9999999999999,
+        224
+      ],
+      "parameters": {},
+      "notes": "Sends a reminder if opted in and within the messaging window. (needs: Facebook Page access token)",
+      "notesInFlow": false
+    },
+    {
+      "id": "7a1d97a0-56d5-afd2-a695-4cb68d1c88ec",
+      "name": "Wait (Email Delay)",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [
+        672,
+        224
+      ],
+      "parameters": {},
+      "notes": "Waits until the 24-hour mark before emailing.",
+      "notesInFlow": false
+    },
+    {
+      "id": "d9cf6463-5d19-ff1f-5a31-9925bfdbed8d",
+      "name": "Check Order Completed Again",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        364,
+        224
+      ],
+      "parameters": {},
+      "notes": "Re-confirms the cart is still unrecovered. (needs: Shopify Admin API access token)",
+      "notesInFlow": false
+    },
+    {
+      "id": "fad15d83-2848-8c59-84a9-e68b4a76db1e",
+      "name": "Generate Discount Code",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        56,
+        224
+      ],
+      "parameters": {},
+      "notes": "Creates a single-use discount code via the Shopify API. (needs: Shopify Admin API access token)",
+      "notesInFlow": false
+    },
+    {
+      "id": "bf5144e5-928f-0c94-ce49-b0c05f0587cb",
+      "name": "Draft Recovery Email",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1,
+      "position": [
+        56,
+        384
+      ],
+      "parameters": {},
+      "notes": "Personalizes the follow-up email using the cart contents. (needs: OpenAI API key)",
+      "notesInFlow": false
+    },
+    {
+      "id": "d2b74e75-82c3-fcbe-fe83-97b9dd2c1caf",
+      "name": "Send Recovery Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [
+        364,
+        384
+      ],
+      "parameters": {},
+      "notes": "Sends the follow-up email with the discount code. (needs: Gmail OAuth)",
+      "notesInFlow": false
+    },
+    {
+      "id": "13fe4c0a-3f4e-2480-eeb7-7757183b5e5c",
+      "name": "Log Recovery Attempt",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2,
+      "position": [
+        672,
+        384
+      ],
+      "parameters": {},
+      "notes": "Records the attempt and outcome. (needs: Airtable personal access token)",
+      "notesInFlow": false
+    },
+    {
+      "id": "cfd77310-1405-59b6-818a-b2574ad4c8a9",
+      "name": "Consent Guard",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        979.9999999999999,
+        384
+      ],
+      "parameters": {},
+      "notes": "Blocks messaging to customers without valid opt-in/consent.",
+      "notesInFlow": false
+    },
+    {
+      "id": "1fa2544b-270e-f9ac-b55b-fbfd7ca58318",
+      "name": "Frequency Cap",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        979.9999999999999,
+        544
+      ],
+      "parameters": {},
+      "notes": "Prevents re-targeting the same cart more than once.",
+      "notesInFlow": false
+    },
+    {
+      "id": "fc565bfe-b2b7-8df9-3dc4-e372d48f266e",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        672,
+        544
+      ],
+      "parameters": {},
+      "notes": "Logs failures in the recovery sequence. (needs: Airtable personal access token)",
+      "notesInFlow": false
+    }
+  ],
+  "connections": {
+    "Checkout Abandoned Webhook": {
+      "main": [
+        [
+          {
+            "node": "Wait (Recovery Delay)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait (Recovery Delay)": {
+      "main": [
+        [
+          {
+            "node": "Check Order Completed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Order Completed": {
+      "main": [
+        [
+          {
+            "node": "Messenger Opt-in Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Messenger Opt-in Check": {
+      "main": [
+        [
+          {
+            "node": "Send Messenger Nudge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Messenger Nudge": {
+      "main": [
+        [
+          {
+            "node": "Wait (Email Delay)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait (Email Delay)": {
+      "main": [
+        [
+          {
+            "node": "Check Order Completed Again",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Order Completed Again": {
+      "main": [
+        [
+          {
+            "node": "Generate Discount Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Discount Code": {
+      "main": [
+        [
+          {
+            "node": "Draft Recovery Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Draft Recovery Email": {
+      "main": [
+        [
+          {
+            "node": "Send Recovery Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Recovery Email": {
+      "main": [
+        [
+          {
+            "node": "Log Recovery Attempt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Recovery Attempt": {
+      "main": [
+        [
+          {
+            "node": "Consent Guard",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consent Guard": {
+      "main": [
+        [
+          {
+            "node": "Frequency Cap",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Frequency Cap": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "flowsaasSlug": "abandoned-cart-recovery-messenger-email",
+    "flowsaasVersion": "1.0.0"
+  }
+}

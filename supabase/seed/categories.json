@@ -1,0 +1,32 @@
+[
+  {
+    "slug": "facebook-crm",
+    "name": "Facebook & CRM",
+    "description": "Turn Facebook Messenger and Page activity into a structured, followed-up CRM pipeline.",
+    "sort": 1
+  },
+  {
+    "slug": "lead-generation",
+    "name": "Lead Generation",
+    "description": "Find, enrich, and route new leads from forms, maps data, and public sources.",
+    "sort": 2
+  },
+  {
+    "slug": "social-media",
+    "name": "Social Media",
+    "description": "Turn one piece of content into channel-ready posts and keep a publishing queue moving.",
+    "sort": 3
+  },
+  {
+    "slug": "e-commerce",
+    "name": "E-Commerce",
+    "description": "Order alerts, fulfilment tracking, and stock-driven automation for Shopify stores.",
+    "sort": 4
+  },
+  {
+    "slug": "ai-llm",
+    "name": "AI & LLM",
+    "description": "Workflows that use an LLM step to triage, answer, or extract structured data.",
+    "sort": 5
+  }
+]

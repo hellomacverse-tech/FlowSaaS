@@ -1,0 +1,235 @@
+{
+  "name": "Website Form Lead Enrichment & Instant Telegram/Slack Alerts (FlowSaaS v1.0.0)",
+  "nodes": [
+    {
+      "id": "1c731593-48f7-3ab5-c323-7a87b683fe6b",
+      "name": "FlowSaaS Setup",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -140
+      ],
+      "parameters": {
+        "content": "FlowSaaS v1.0.0 — setup guide: https://flowsaas.com/workflows/website-form-lead-enrichment-alerts\n\nConnect your own credentials in each node marked with a warning icon. No credentials are included in this file.",
+        "height": 100,
+        "width": 460
+      }
+    },
+    {
+      "id": "eb26bba8-8a88-ef87-e8e8-7eac09d23ec9",
+      "name": "Form Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        56,
+        64
+      ],
+      "parameters": {},
+      "notes": "Receives the form submission as JSON.",
+      "notesInFlow": false
+    },
+    {
+      "id": "2684f237-2510-bf50-05f5-71313af1da26",
+      "name": "Validate Payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        364,
+        64
+      ],
+      "parameters": {},
+      "notes": "Checks required fields are present.",
+      "notesInFlow": false
+    },
+    {
+      "id": "ea1cf191-d52b-7271-bb10-19d2b0c9b6b7",
+      "name": "Enrich & Score",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1,
+      "position": [
+        672,
+        64
+      ],
+      "parameters": {},
+      "notes": "Summarizes intent and assigns an urgency score. (needs: OpenAI API key)",
+      "notesInFlow": false
+    },
+    {
+      "id": "3ef86c34-26d5-89f1-6911-b7f882f9d8af",
+      "name": "Log to Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        979.9999999999999,
+        64
+      ],
+      "parameters": {},
+      "notes": "Appends the enriched lead to your tracking sheet. (needs: Google Sheets OAuth)",
+      "notesInFlow": false
+    },
+    {
+      "id": "82243ae7-ccd5-53b5-28ce-47616974bb21",
+      "name": "Urgency Filter",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        979.9999999999999,
+        224
+      ],
+      "parameters": {},
+      "notes": "Branches high-urgency leads to immediate alerting.",
+      "notesInFlow": false
+    },
+    {
+      "id": "0501c8a9-2236-166c-49d2-d41d10e523b7",
+      "name": "Telegram Alert",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        672,
+        224
+      ],
+      "parameters": {},
+      "notes": "Sends an instant alert for urgent leads. (needs: Telegram bot token)",
+      "notesInFlow": false
+    },
+    {
+      "id": "5c70b23c-4027-4d6f-f928-98126301386a",
+      "name": "Slack Alert",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2,
+      "position": [
+        364,
+        224
+      ],
+      "parameters": {},
+      "notes": "Posts a summary to your team's Slack channel. (needs: Slack webhook)",
+      "notesInFlow": false
+    },
+    {
+      "id": "62d63bc7-9770-4ea0-a8eb-7b6a630e0be3",
+      "name": "Confirmation Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        56,
+        224
+      ],
+      "parameters": {},
+      "notes": "Returns a JSON success response to the form tool.",
+      "notesInFlow": false
+    },
+    {
+      "id": "5d41d5d6-7519-6835-bce5-9dbaa7e23c5c",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        56,
+        384
+      ],
+      "parameters": {},
+      "notes": "Logs failed enrichments for review. (needs: Google Sheets OAuth)",
+      "notesInFlow": false
+    }
+  ],
+  "connections": {
+    "Form Webhook": {
+      "main": [
+        [
+          {
+            "node": "Validate Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Payload": {
+      "main": [
+        [
+          {
+            "node": "Enrich & Score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enrich & Score": {
+      "main": [
+        [
+          {
+            "node": "Log to Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log to Sheet": {
+      "main": [
+        [
+          {
+            "node": "Urgency Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Urgency Filter": {
+      "main": [
+        [
+          {
+            "node": "Telegram Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Alert": {
+      "main": [
+        [
+          {
+            "node": "Slack Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Slack Alert": {
+      "main": [
+        [
+          {
+            "node": "Confirmation Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Confirmation Response": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "flowsaasSlug": "website-form-lead-enrichment-alerts",
+    "flowsaasVersion": "1.0.0"
+  }
+}

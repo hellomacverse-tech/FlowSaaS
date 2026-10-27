@@ -1,0 +1,134 @@
+[
+  {
+    "slug": "facebook-messenger",
+    "name": "Facebook Messenger",
+    "docs_url": "https://developers.facebook.com/docs/messenger-platform",
+    "popularity": 100
+  },
+  {
+    "slug": "openai",
+    "name": "OpenAI",
+    "docs_url": "https://platform.openai.com/docs",
+    "popularity": 95
+  },
+  {
+    "slug": "google-sheets",
+    "name": "Google Sheets",
+    "docs_url": "https://developers.google.com/sheets/api",
+    "popularity": 98
+  },
+  {
+    "slug": "shopify",
+    "name": "Shopify",
+    "docs_url": "https://shopify.dev/docs",
+    "popularity": 80
+  },
+  {
+    "slug": "airtable",
+    "name": "Airtable",
+    "docs_url": "https://airtable.com/developers/web/api/introduction",
+    "popularity": 70
+  },
+  {
+    "slug": "telegram",
+    "name": "Telegram",
+    "docs_url": "https://core.telegram.org/bots/api",
+    "popularity": 75
+  },
+  {
+    "slug": "slack",
+    "name": "Slack",
+    "docs_url": "https://api.slack.com/",
+    "popularity": 65
+  },
+  {
+    "slug": "gmail",
+    "name": "Gmail",
+    "docs_url": "https://developers.google.com/gmail/api",
+    "popularity": 60
+  },
+  {
+    "slug": "notion",
+    "name": "Notion",
+    "docs_url": "https://developers.notion.com/",
+    "popularity": 40
+  },
+  {
+    "slug": "hubspot",
+    "name": "HubSpot",
+    "docs_url": "https://developers.hubspot.com/",
+    "popularity": 35
+  },
+  {
+    "slug": "whatsapp-business",
+    "name": "WhatsApp Business",
+    "docs_url": "https://developers.facebook.com/docs/whatsapp",
+    "popularity": 55
+  },
+  {
+    "slug": "stripe",
+    "name": "Stripe",
+    "docs_url": "https://stripe.com/docs",
+    "popularity": 45
+  },
+  {
+    "slug": "wordpress",
+    "name": "WordPress",
+    "docs_url": "https://developer.wordpress.org/rest-api/",
+    "popularity": 50
+  },
+  {
+    "slug": "linkedin",
+    "name": "LinkedIn",
+    "docs_url": "https://learn.microsoft.com/en-us/linkedin/",
+    "popularity": 42
+  },
+  {
+    "slug": "x-twitter",
+    "name": "X (Twitter)",
+    "docs_url": "https://developer.x.com/en/docs",
+    "popularity": 38
+  },
+  {
+    "slug": "facebook-pages",
+    "name": "Facebook Pages",
+    "docs_url": "https://developers.facebook.com/docs/pages-api",
+    "popularity": 58
+  },
+  {
+    "slug": "instagram",
+    "name": "Instagram",
+    "docs_url": "https://developers.facebook.com/docs/instagram-api",
+    "popularity": 48
+  },
+  {
+    "slug": "google-drive",
+    "name": "Google Drive",
+    "docs_url": "https://developers.google.com/drive",
+    "popularity": 30
+  },
+  {
+    "slug": "google-calendar",
+    "name": "Google Calendar",
+    "docs_url": "https://developers.google.com/calendar",
+    "popularity": 25
+  },
+  {
+    "slug": "webhook",
+    "name": "Webhook",
+    "docs_url": null,
+    "popularity": 60
+  },
+  {
+    "slug": "google-places",
+    "name": "Google Places",
+    "docs_url": "https://developers.google.com/maps/documentation/places",
+    "popularity": 44
+  },
+  {
+    "slug": "rss",
+    "name": "RSS",
+    "docs_url": null,
+    "popularity": 20
+  }
+]

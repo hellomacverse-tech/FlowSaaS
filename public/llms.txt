@@ -1,0 +1,22 @@
+# FlowSaaS
+
+> Production-ready n8n workflow templates, an all-access VIP pass, done-for-you
+> managed automation setups, and browser-run Micro-SaaS tools — no n8n
+> installation required for the tools.
+
+FlowSaaS sells and helps deploy n8n automation workflows across four tiers: a
+one-time-purchase template store, an unlimited-downloads VIP subscription,
+fully managed done-for-you setups, and on-demand browser tools that run
+workflows without touching n8n directly.
+
+## Key pages
+
+- [Workflow Catalog](/workflows) — browse all published n8n workflow templates
+- [Managed Services](/services) — done-for-you setup, process, and packages
+- [Micro-SaaS Tools](/tools) — run automations from the browser, no n8n needed
+- [Pricing](/pricing) — templates, VIP Pass, DFY, and credit pack pricing
+- [Integrations](/integrations) — every app FlowSaaS workflows connect
+- [ROI Calculator](/roi-calculator) — estimate hours and cost saved
+
+Note: this file is regenerated once the workflow catalog is seeded (Phase 3)
+to include the top 12 workflow pages directly, per Section 13.6.

@@ -1,0 +1,331 @@
+{
+  "name": "Business Lead Finder: Google Places to Airtable with Email Enrichment (FlowSaaS v1.0.0)",
+  "nodes": [
+    {
+      "id": "23917ccc-d773-d495-46fa-3d90910e549c",
+      "name": "FlowSaaS Setup",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -140
+      ],
+      "parameters": {
+        "content": "FlowSaaS v1.0.0 — setup guide: https://flowsaas.com/workflows/google-maps-lead-scraper-airtable\n\nConnect your own credentials in each node marked with a warning icon. No credentials are included in this file.",
+        "height": 100,
+        "width": 460
+      }
+    },
+    {
+      "id": "aafcb96e-394c-2f0e-7c97-35262ef6dfd1",
+      "name": "Manual/Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        56,
+        64
+      ],
+      "parameters": {},
+      "notes": "Starts a search run with a query and area.",
+      "notesInFlow": false
+    },
+    {
+      "id": "e2402cd1-eadd-510e-19eb-c36981d558ab",
+      "name": "Places Text Search",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        364,
+        64
+      ],
+      "parameters": {},
+      "notes": "Queries the Google Places API for matching businesses. (needs: Google Places API key)",
+      "notesInFlow": false
+    },
+    {
+      "id": "ea6abc4a-e2ac-a60f-ca74-bd378f5e6acc",
+      "name": "Places Details",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        672,
+        64
+      ],
+      "parameters": {},
+      "notes": "Fetches phone, website, and rating for each result. (needs: Google Places API key)",
+      "notesInFlow": false
+    },
+    {
+      "id": "398a88c3-d4c6-91d0-0d43-b97c8da90636",
+      "name": "Filter by Rating",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        979.9999999999999,
+        64
+      ],
+      "parameters": {},
+      "notes": "Drops results below a minimum rating threshold.",
+      "notesInFlow": false
+    },
+    {
+      "id": "575c68c0-37aa-d8d3-85d8-3c30c26185df",
+      "name": "Find Existing Record",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2,
+      "position": [
+        979.9999999999999,
+        224
+      ],
+      "parameters": {},
+      "notes": "Checks for an existing record by Place ID. (needs: Airtable personal access token)",
+      "notesInFlow": false
+    },
+    {
+      "id": "c1cd87fa-0b0a-c94e-bef5-6f6c78ab054a",
+      "name": "Enrich Contact & Pitch",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1,
+      "position": [
+        672,
+        224
+      ],
+      "parameters": {},
+      "notes": "Infers a likely contact role and drafts a one-line pitch angle. (needs: OpenAI API key)",
+      "notesInFlow": false
+    },
+    {
+      "id": "eb86a95d-81ee-78a4-e7fe-2f95f00bf3d6",
+      "name": "Normalize Phone/Website",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        364,
+        224
+      ],
+      "parameters": {},
+      "notes": "Cleans phone formatting and website URLs.",
+      "notesInFlow": false
+    },
+    {
+      "id": "389cbbc3-2dbf-7701-27d3-a2ea46bb592c",
+      "name": "Upsert Lead Record",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2,
+      "position": [
+        56,
+        224
+      ],
+      "parameters": {},
+      "notes": "Writes or updates the business in the Leads table. (needs: Airtable personal access token)",
+      "notesInFlow": false
+    },
+    {
+      "id": "edafd3c9-eb30-338a-a79e-3a262de008bd",
+      "name": "Batch Counter",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        56,
+        384
+      ],
+      "parameters": {},
+      "notes": "Tracks how many results have been processed this run.",
+      "notesInFlow": false
+    },
+    {
+      "id": "e1c2137a-f965-68b7-e4b3-c8b6ac59c37d",
+      "name": "Pagination Handler",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        364,
+        384
+      ],
+      "parameters": {},
+      "notes": "Follows the Places API's next-page token. (needs: Google Places API key)",
+      "notesInFlow": false
+    },
+    {
+      "id": "471dc895-1575-d0f0-eddd-3d0ea827779a",
+      "name": "Run Summary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        672,
+        384
+      ],
+      "parameters": {},
+      "notes": "Builds a summary of how many leads were added.",
+      "notesInFlow": false
+    },
+    {
+      "id": "e35de240-8220-d425-2f4f-0278c806469d",
+      "name": "Notify Team",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2,
+      "position": [
+        979.9999999999999,
+        384
+      ],
+      "parameters": {},
+      "notes": "Posts the run summary to Slack. (needs: Slack webhook)",
+      "notesInFlow": false
+    },
+    {
+      "id": "89c862e0-9e3a-d150-454d-aa9db7560394",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        979.9999999999999,
+        544
+      ],
+      "parameters": {},
+      "notes": "Logs API failures for review. (needs: Airtable personal access token)",
+      "notesInFlow": false
+    }
+  ],
+  "connections": {
+    "Manual/Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Places Text Search",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Places Text Search": {
+      "main": [
+        [
+          {
+            "node": "Places Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Places Details": {
+      "main": [
+        [
+          {
+            "node": "Filter by Rating",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter by Rating": {
+      "main": [
+        [
+          {
+            "node": "Find Existing Record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Existing Record": {
+      "main": [
+        [
+          {
+            "node": "Enrich Contact & Pitch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enrich Contact & Pitch": {
+      "main": [
+        [
+          {
+            "node": "Normalize Phone/Website",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Phone/Website": {
+      "main": [
+        [
+          {
+            "node": "Upsert Lead Record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upsert Lead Record": {
+      "main": [
+        [
+          {
+            "node": "Batch Counter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Batch Counter": {
+      "main": [
+        [
+          {
+            "node": "Pagination Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pagination Handler": {
+      "main": [
+        [
+          {
+            "node": "Run Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Summary": {
+      "main": [
+        [
+          {
+            "node": "Notify Team",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Team": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "flowsaasSlug": "google-maps-lead-scraper-airtable",
+    "flowsaasVersion": "1.0.0"
+  }
+}
