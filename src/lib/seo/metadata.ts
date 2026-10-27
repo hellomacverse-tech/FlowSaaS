@@ -43,3 +43,6 @@ export function constructMetadata({
     }),
   };
 }
+
+// Aliasing to fix the import error across pages
+export const buildPageMetadata = constructMetadata;
