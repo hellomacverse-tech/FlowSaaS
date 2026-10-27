@@ -53,7 +53,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function Page({ params }: Props) {
   const { slug } = await params;
   const r = await resolveIntegrationSlug(slug);
-  if (r.kind === 'redirect') permanentRedirect(r.to as any); // 308: treated as permanent by search engines
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   if (r.kind === 'redirect') permanentRedirect(r.to as any); // 308: treated as permanent by search engines
   if (r.kind === 'notFound') notFound();
   if (r.kind === 'pair') return <PairPage vm={await loadPairContext(r)} siteUrl={env.NEXT_PUBLIC_SITE_URL} />;
   return <HubPage ctx={await loadHubContext(r.integration)} siteUrl={env.NEXT_PUBLIC_SITE_URL} />;
