@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { JsonLd } from '@/components/seo/JsonLd';
 import { PseoBreadcrumbs } from './PseoBreadcrumbs';
 import { PairDiagram } from './PairDiagram';

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { JsonLd } from '@/components/seo/JsonLd';
 import { PseoBreadcrumbs } from './PseoBreadcrumbs';
 import { buildHubGraph } from '@/lib/schema/hub';
@@ -27,7 +28,7 @@ export function HubPage({ ctx, siteUrl }: { ctx: HubContext; siteUrl: string }) 
         <h2 id="hub-workflows" className={H2}>Workflows that use {i.name}</h2>
         {workflows.length ? (
           <ul className="mt-6 grid auto-rows-fr gap-6 md:grid-cols-2 xl:grid-cols-3">
-            {workflows.map((w) => (
+            {workflows.map((w: any) => (
               <li key={w.slug} className={`${CARD} p-6`}>
                 <h3 className="text-lg font-semibold">
                   <Link className="hover:underline" href={`/workflows/${w.slug}` as any}>{w.title}</Link>
@@ -38,7 +39,7 @@ export function HubPage({ ctx, siteUrl }: { ctx: HubContext; siteUrl: string }) 
           </ul>
         ) : (
           <p className="mt-6 text-ink-2">
-            No ready-made workflow uses {i.name} yet. <Link className="underline" href="/services#quote">Request one</Link>.
+            No ready-made workflow uses {i.name} yet. <Link className="underline" href="/services#quote" suppressHydrationWarning>Request one</Link>.
           </p>
         )}
       </section>
@@ -47,7 +48,7 @@ export function HubPage({ ctx, siteUrl }: { ctx: HubContext; siteUrl: string }) 
         <h2 id="hub-pairs" className={H2}>{i.name} integration guides</h2>
         {pairs.length ? (
           <ul className="mt-6 grid gap-4 md:grid-cols-2">
-            {pairs.map((p) => (
+            {pairs.map((p: any) => (
               <li key={p.pair.slug} className={`${CARD} p-5`}>
                 <Link className="font-semibold hover:underline" href={`/integrations/${p.pair.slug}` as any}>
                   {p.pair.slug.startsWith(i.slug) ? `${i.name} to ${p.partner.name}` : `${p.partner.name} to ${i.name}`}
