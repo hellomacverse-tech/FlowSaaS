@@ -1,0 +1,59 @@
+name: phase8-checks
+on:
+  pull_request:
+  push: { branches: [main] }
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+    services:
+      redis:
+        image: redis:7
+        ports: ['6379:6379']
+      srh:
+        image: hiett/serverless-redis-http:latest
+        ports: ['8079:80']
+        env:
+          SRH_MODE: env
+          SRH_TOKEN: ci_token
+          SRH_CONNECTION_STRING: redis://redis:6379
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '${{ env.NODE_VERSION }}', cache: pnpm }
+      - uses: supabase/setup-cli@v1
+      - run: pnpm install --frozen-lockfile
+      - run: supabase start -x studio,imgproxy,inbucket
+      - name: Export Supabase env
+        run: |
+          eval "$(supabase status -o env)"
+          {
+            echo "SUPABASE_URL=$API_URL"
+            echo "NEXT_PUBLIC_SUPABASE_URL=$API_URL"
+            echo "SUPABASE_ANON_KEY=$ANON_KEY"
+            echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=$ANON_KEY"
+            echo "SUPABASE_SERVICE_ROLE_KEY=$SERVICE_ROLE_KEY"
+          } >> "$GITHUB_ENV"
+      - run: pnpm generate:workflows && pnpm seed && pnpm seed:pairs
+      - run: pnpm vitest run --config vitest.integration.config.ts
+      - run: pnpm audit:pseo && pnpm audit:links
+      - run: pnpm audit:pseo:db && pnpm audit:links:db
+
+  security:
+    runs-on: ubuntu-latest
+    permissions: { security-events: write, contents: read }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '${{ env.NODE_VERSION }}', cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: bash scripts/guard-secrets.sh
+      - run: pnpm audit --prod --audit-level=high
+      - uses: github/codeql-action/init@v3
+        with: { languages: javascript-typescript }
+      - uses: github/codeql-action/analyze@v3

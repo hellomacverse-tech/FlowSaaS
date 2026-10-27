@@ -1,0 +1,24 @@
+{
+  "name": "FlowSaaS Health",
+  "nodes": [
+    {
+      "parameters": { "httpMethod": "GET", "path": "flowsaas-health", "responseMode": "responseNode", "options": {} },
+      "id": "b1f1c0de-0000-4000-8000-000000000001",
+      "name": "Health Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 0]
+    },
+    {
+      "parameters": { "respondWith": "json", "responseBody": "{\"ok\": true}", "options": {} },
+      "id": "b1f1c0de-0000-4000-8000-000000000002",
+      "name": "Respond OK",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [240, 0]
+    }
+  ],
+  "connections": { "Health Webhook": { "main": [[{ "node": "Respond OK", "type": "main", "index": 0 }]] } },
+  "active": false,
+  "settings": { "executionOrder": "v1" }
+}

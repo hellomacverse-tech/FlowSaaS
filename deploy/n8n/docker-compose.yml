@@ -1,0 +1,72 @@
+# n8n in queue mode on a dedicated VPS. Check variable names against docs for your pinned N8N_VERSION.
+#
+# DECISION (resolves the Phase 7/8 contradiction): the signature-verify Code node reads the HMAC secret from
+# $env, so N8N_BLOCK_ENV_ACCESS_IN_NODE must be "false". This is acceptable ONLY because this instance runs
+# staff-authored FlowSaaS workflows; customer workflows run on customers' own instances. Any author on this
+# instance can read every env var below.
+x-n8n: &n8n
+  image: docker.n8n.io/n8nio/n8n:${N8N_VERSION}
+  restart: unless-stopped
+  depends_on: [postgres, redis]
+  environment: &env
+    DB_TYPE: postgresdb
+    DB_POSTGRESDB_HOST: postgres
+    DB_POSTGRESDB_DATABASE: n8n
+    DB_POSTGRESDB_USER: n8n
+    DB_POSTGRESDB_PASSWORD: ${N8N_DB_PASSWORD}
+    EXECUTIONS_MODE: queue
+    QUEUE_BULL_REDIS_HOST: redis
+    QUEUE_BULL_REDIS_PASSWORD: ${REDIS_PASSWORD}
+    N8N_ENCRYPTION_KEY: ${N8N_ENCRYPTION_KEY}
+    N8N_HOST: n8n.flowsaas.com
+    N8N_PROTOCOL: https
+    WEBHOOK_URL: https://n8n.flowsaas.com/
+    N8N_PROXY_HOPS: "1"
+    N8N_DIAGNOSTICS_ENABLED: "false"
+    N8N_BLOCK_ENV_ACCESS_IN_NODE: "false"
+    NODES_EXCLUDE: '["n8n-nodes-base.executeCommand","n8n-nodes-base.ssh"]'
+    EXECUTIONS_DATA_PRUNE: "true"
+    EXECUTIONS_DATA_MAX_AGE: "168"
+    EXECUTIONS_TIMEOUT: "60"
+    GENERIC_TIMEZONE: UTC
+    N8N_WEBHOOK_SIGNING_SECRET: ${N8N_WEBHOOK_SIGNING_SECRET}
+
+services:
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: n8n
+      POSTGRES_PASSWORD: ${N8N_DB_PASSWORD}
+      POSTGRES_DB: n8n
+    volumes: [pgdata:/var/lib/postgresql/data]
+  redis:
+    image: redis:7
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes", "--requirepass", "${REDIS_PASSWORD}"]
+    volumes: [redisdata:/data]
+  n8n-main:
+    <<: *n8n
+    environment:
+      <<: *env
+      N8N_DISABLE_PRODUCTION_MAIN_PROCESS: "true"
+  n8n-webhook:
+    <<: *n8n
+    command: webhook
+    deploy: { replicas: 2 }
+  n8n-worker:
+    <<: *n8n
+    command: worker --concurrency=5
+    deploy: { replicas: 2 }
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN}
+# Cloudflare Tunnel routes (configure in the dashboard):
+#   n8n.flowsaas.com/webhook/*  -> http://n8n-webhook:5678   (public, WAF rate limit ~100 req/min/IP)
+#   n8n.flowsaas.com/*          -> http://n8n-main:5678      (behind Cloudflare Access only)
+volumes:
+  pgdata: {}
+  redisdata: {}

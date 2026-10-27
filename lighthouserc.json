@@ -1,0 +1,65 @@
+{
+  "ci": {
+    "collect": {
+      "startServerCommand": "pnpm start",
+      "startServerReadyPattern": "Ready",
+      "url": [
+        "http://localhost:3000/",
+        "http://localhost:3000/workflows",
+        "http://localhost:3000/workflows/facebook-messenger-crm-google-sheets",
+        "http://localhost:3000/integrations/facebook-messenger-to-google-sheets",
+        "http://localhost:3000/services",
+        "http://localhost:3000/pricing"
+      ],
+      "numberOfRuns": 3,
+      "settings": {
+        "formFactor": "mobile",
+        "throttling": { "rttMs": 150, "throughputKbps": 1638, "cpuSlowdownMultiplier": 4 },
+        "screenEmulation": { "mobile": true, "width": 412, "height": 823, "deviceScaleFactor": 1.75, "disabled": false }
+      }
+    },
+    "assert": {
+      "assertMatrix": [
+        {
+          "matchingUrlPattern": "^http://localhost:3000/$",
+          "assertions": {
+            "categories:performance": ["error", { "minScore": 0.95 }],
+            "categories:accessibility": ["error", { "minScore": 0.95 }],
+            "categories:seo": ["error", { "minScore": 0.98 }],
+            "largest-contentful-paint": ["error", { "maxNumericValue": 1800 }],
+            "cumulative-layout-shift": ["error", { "maxNumericValue": 0.05 }],
+            "total-blocking-time": ["error", { "maxNumericValue": 150 }],
+            "server-response-time": ["warn", { "maxNumericValue": 400 }],
+            "resource-summary:script:size": ["error", { "maxNumericValue": 122880 }]
+          }
+        },
+        {
+          "matchingUrlPattern": "^http://localhost:3000/workflows/[a-z0-9-]+$",
+          "assertions": {
+            "categories:performance": ["error", { "minScore": 0.95 }],
+            "categories:accessibility": ["error", { "minScore": 0.95 }],
+            "categories:seo": ["error", { "minScore": 0.98 }],
+            "largest-contentful-paint": ["error", { "maxNumericValue": 1800 }],
+            "cumulative-layout-shift": ["error", { "maxNumericValue": 0.05 }],
+            "total-blocking-time": ["error", { "maxNumericValue": 150 }],
+            "server-response-time": ["warn", { "maxNumericValue": 400 }],
+            "resource-summary:script:size": ["error", { "maxNumericValue": 153600 }]
+          }
+        },
+        {
+          "matchingUrlPattern": "^http://localhost:3000/(workflows|services|pricing|integrations/[a-z0-9-]+)$",
+          "assertions": {
+            "categories:performance": ["error", { "minScore": 0.95 }],
+            "categories:accessibility": ["error", { "minScore": 0.95 }],
+            "categories:seo": ["error", { "minScore": 0.98 }],
+            "largest-contentful-paint": ["error", { "maxNumericValue": 1800 }],
+            "cumulative-layout-shift": ["error", { "maxNumericValue": 0.05 }],
+            "total-blocking-time": ["error", { "maxNumericValue": 150 }],
+            "server-response-time": ["warn", { "maxNumericValue": 400 }]
+          }
+        }
+      ]
+    },
+    "upload": { "target": "temporary-public-storage" }
+  }
+}
