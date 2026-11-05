@@ -8,32 +8,36 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { ManageBillingButton } from "./ManageBillingButton";
 
-function maskKey(key: string): string {
+function maskKey(key: string | null | undefined): string {
+  if (!key) return "FSK-••••-••••-••••-••••";
   const parts = key.split("-");
   const last = parts[parts.length - 1] ?? "";
   return `FSK-••••-••••-••••-${last}`;
 }
 
 export function AccountInfoCard({
-  email,
+  email = "User",
   fullName,
-  tier,
-  licenseKey: initialKey,
+  tier = "free",
+  licenseKey: initialKey = "FSK-DEMO-KEY-1234",
   renewsAt,
-  hasStripeCustomer,
+  hasStripeCustomer = false,
 }: {
-  email: string;
-  fullName: string | null;
-  tier: "free" | "vip" | "enterprise";
-  licenseKey: string;
-  renewsAt: string | null;
-  hasStripeCustomer: boolean;
+  email?: string;
+  fullName?: string | null;
+  tier?: "free" | "vip" | "enterprise";
+  licenseKey?: string;
+  renewsAt?: string | null;
+  hasStripeCustomer?: boolean;
 }) {
   const [licenseKey, setLicenseKey] = useState(initialKey);
   const [revealed, setRevealed] = useState(false);
   const [copied, setCopied] = useState(false);
   const [confirmingRegen, setConfirmingRegen] = useState(false);
   const [regenerating, setRegenerating] = useState(false);
+
+  const displayEmail = email || "user@flowsaas.com";
+  const displayName = fullName || displayEmail;
 
   async function copyKey() {
     await navigator.clipboard.writeText(licenseKey);
@@ -60,11 +64,11 @@ export function AccountInfoCard({
     <Card className="flex h-full flex-col p-6">
       <div className="flex items-center gap-3">
         <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-violet-50 text-sm font-semibold text-violet-600">
-          {email.slice(0, 2).toUpperCase()}
+          {displayEmail.slice(0, 2).toUpperCase()}
         </span>
         <div className="min-w-0">
-          <p className="truncate text-sm font-semibold text-ink">{fullName || email}</p>
-          <p className="truncate text-xs text-muted">{email}</p>
+          <p className="truncate text-sm font-semibold text-ink">{displayName}</p>
+          <p className="truncate text-xs text-muted">{displayEmail}</p>
         </div>
       </div>
 

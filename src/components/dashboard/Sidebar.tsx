@@ -3,7 +3,7 @@
 import Link from "next/link";
 import type { Route } from "next";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Zap, KeyRound, BarChart3, Download, Server, CreditCard } from "lucide-react";
+import { LayoutDashboard, Zap, KeyRound, BarChart3, Download, Server, CreditCard, ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/cn";
 
 const primaryItems: { href: Route; label: string; icon: typeof LayoutDashboard }[] = [
@@ -50,14 +50,25 @@ export function DesktopSidebar({ tier }: { tier: "free" | "vip" | "enterprise" }
         ))}
       </nav>
 
-      {tier === "free" ? (
-        <div className="hidden rounded-2xl bg-violet-50 p-4 lg:block">
-          <p className="text-sm font-semibold text-ink">Get 2,000 credits/mo with VIP</p>
-          <Link href="/pricing#vip" className="mt-2 inline-block text-sm font-medium text-violet-600 hover:underline">
-            Start Free Trial →
-          </Link>
-        </div>
-      ) : null}
+      <div className="flex flex-col gap-4">
+        {/* Back to Website Link */}
+        <Link
+          href="/"
+          className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-ink-2 hover:bg-surface transition-colors border border-slate-100"
+        >
+          <ArrowLeft aria-hidden="true" size={18} strokeWidth={1.75} className="shrink-0 text-violet-600" />
+          <span className="hidden lg:inline font-semibold text-violet-600">Back to Website</span>
+        </Link>
+
+        {tier === "free" ? (
+          <div className="hidden rounded-2xl bg-violet-50 p-4 lg:block">
+            <p className="text-sm font-semibold text-ink">Get 2,000 credits/mo with VIP</p>
+            <Link href="/pricing#vip" className="mt-2 inline-block text-sm font-medium text-violet-600 hover:underline">
+              Start Free Trial →
+            </Link>
+          </div>
+        ) : null}
+      </div>
     </aside>
   );
 }

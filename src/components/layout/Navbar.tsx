@@ -9,11 +9,6 @@ import { Button } from "@/components/ui/Button";
 import { primaryNav } from "@/config/nav";
 import { cn } from "@/lib/cn";
 
-/**
- * Signed-in state (avatar menu, "Open Dashboard") is wired up once
- * Supabase auth lands in Phase 4 (Section 8). Until then the navbar always
- * renders the signed-out CTAs described in Section 9.0.
- */
 export function Navbar() {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
@@ -58,7 +53,6 @@ export function Navbar() {
 
   return (
     <>
-      {/* 1px-tall sentinel the IntersectionObserver watches instead of a scroll listener. */}
       <div ref={sentinelRef} className="absolute top-0 h-px w-px" aria-hidden="true" />
       <header
         className={cn(
@@ -69,7 +63,7 @@ export function Navbar() {
         <div className="mx-auto flex h-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <Logo />
 
-          <nav aria-label="Primary" className="hidden lg:flex lg:items-center lg:gap-1">
+          <nav aria-label="Primary" className="hidden lg:flex lg:items-center lg:gap-0.5 xl:gap-1">
             {primaryNav.map((link) => {
               const isActive = pathname === link.href;
               return (
@@ -78,7 +72,7 @@ export function Navbar() {
                   href={link.href}
                   aria-current={isActive ? "page" : undefined}
                   className={cn(
-                    "relative rounded-lg px-3 py-2 text-sm font-medium text-ink-2 transition-colors duration-200 hover:bg-surface",
+                    "relative rounded-lg px-2.5 py-2 text-xs xl:text-sm font-medium text-ink-2 transition-colors duration-200 hover:bg-surface",
                     isActive && "text-ink",
                   )}
                 >
@@ -86,7 +80,7 @@ export function Navbar() {
                   {isActive ? (
                     <span
                       aria-hidden="true"
-                      className="absolute -bottom-1.5 left-3 right-3 h-0.5 rounded-full bg-gradient-flow"
+                      className="absolute -bottom-1.5 left-2.5 right-2.5 h-0.5 rounded-full bg-gradient-flow"
                     />
                   ) : null}
                 </Link>
@@ -94,12 +88,18 @@ export function Navbar() {
             })}
           </nav>
 
-          <div className="hidden lg:flex lg:items-center lg:gap-3">
-            <Button asChild variant="secondary-outline" size="sm">
-              <Link href="/workflows">Browse Workflows</Link>
+          <div className="hidden lg:flex lg:items-center lg:gap-2 xl:gap-3">
+            <Button asChild variant="secondary-outline" size="sm" className="text-xs xl:text-sm px-3">
+              <Link href="/workflows">Workflows</Link>
             </Button>
-            <Button asChild variant="primary" size="sm">
-              <Link href="/signup">Get Started Free</Link>
+            <Link
+              href="/login"
+              className="text-xs xl:text-sm font-medium text-ink-2 hover:text-violet-600 transition-colors px-1.5"
+            >
+              Sign In
+            </Link>
+            <Button asChild variant="primary" size="sm" className="text-xs xl:text-sm">
+              <Link href="/signup">Get Started</Link>
             </Button>
           </div>
 
@@ -154,6 +154,9 @@ export function Navbar() {
           <div className="flex flex-col gap-3 border-t border-line/70 p-4 pb-[calc(1rem+env(safe-area-inset-bottom,0px))] sm:px-6">
             <Button asChild variant="secondary-outline" size="lg">
               <Link href="/workflows">Browse Workflows</Link>
+            </Button>
+            <Button asChild variant="secondary-outline" size="lg">
+              <Link href="/login">Sign In</Link>
             </Button>
             <Button asChild variant="primary" size="lg">
               <Link href="/signup">Get Started Free</Link>

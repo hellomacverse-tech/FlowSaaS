@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { HelpCircle, ChevronDown } from "lucide-react";
+import { HelpCircle, ChevronDown, Home } from "lucide-react";
 import { SignOutButton } from "@/components/auth/SignOutButton";
 import { Badge } from "@/components/ui/Badge";
 
@@ -25,9 +25,19 @@ export function TopBar({ email, creditsRemaining, creditsIncluded }: { email: st
       <p className="text-sm font-semibold text-ink">Dashboard</p>
 
       <div className="flex items-center gap-3">
+        {/* Back to Website Button */}
+        <Link
+          href="/"
+          className="hidden sm:flex items-center gap-1.5 rounded-xl border border-slate-200 bg-surface/50 px-3 py-1.5 text-xs font-semibold text-ink hover:bg-slate-100 transition-colors"
+        >
+          <Home aria-hidden="true" size={14} className="text-violet-600" />
+          <span>Back to Home</span>
+        </Link>
+
         <Badge tone={low ? "amber" : "teal"} className="hidden sm:inline-flex">
           {creditsRemaining} credits
         </Badge>
+        
         <Link href="/workflows#faq" aria-label="Help" className="rounded-lg p-2 text-muted hover:bg-surface hover:text-ink-2">
           <HelpCircle aria-hidden="true" size={18} />
         </Link>
@@ -42,6 +52,13 @@ export function TopBar({ email, creditsRemaining, creditsIncluded }: { email: st
           {menuOpen ? (
             <div role="menu" className="absolute right-0 top-full mt-2 w-56 rounded-xl border border-line/70 bg-white p-2 shadow-md">
               <p className="truncate px-2 py-1.5 text-xs text-muted">{email}</p>
+              
+              {/* Mobile Back to Home Link inside Dropdown */}
+              <Link href="/" role="menuitem" className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm font-medium text-violet-600 hover:bg-violet-50 sm:hidden">
+                <Home size={14} />
+                <span>Back to Home</span>
+              </Link>
+
               <Link href="/app" role="menuitem" className="block rounded-lg px-2 py-1.5 text-sm text-ink-2 hover:bg-surface">
                 Overview
               </Link>
