@@ -79,8 +79,8 @@ importers:
         specifier: 4.10.1
         version: 4.10.1(playwright-core@1.51.1)
       '@eslint/eslintrc':
-        specifier: 3.2.0
-        version: 3.2.0(supports-color@8.1.1)
+        specifier: 3.3.7
+        version: 3.3.7(supports-color@8.1.1)
       '@lhci/cli':
         specifier: ^0.15.1
         version: 0.15.1(supports-color@8.1.1)
@@ -534,8 +534,8 @@ packages:
     resolution: {integrity: sha512-GuUdqkyyzQI5RMIWkHhvTWLCyLo1jNK3vzkSyaExH5kHPDHcuL2VOpHjmMY+y3+NC69qAKToBqldTBgYeLSr9Q==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
-  '@eslint/eslintrc@3.2.0':
-    resolution: {integrity: sha512-grOjVNN8P3hjJn/eIETF1wwd12DdnwFDoyceUJLYYdkpbwq3nLi+4fqrTAONx7XDALqlL220wC/RHSC/QTI/0w==}
+  '@eslint/eslintrc@3.3.7':
+    resolution: {integrity: sha512-F42g89Qd5oAWtp0k0nnSrjziAKza7w8SVT4mStc18LZMaRb4J1HQAHLCalEtDCxrTuksx7NU9qsmeLwpOfPqWw==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
   '@eslint/js@9.17.0':
@@ -5117,7 +5117,7 @@ snapshots:
     dependencies:
       '@types/json-schema': 7.0.15
 
-  '@eslint/eslintrc@3.2.0(supports-color@8.1.1)':
+  '@eslint/eslintrc@3.3.7(supports-color@8.1.1)':
     dependencies:
       ajv: 6.15.0
       debug: 4.4.3(supports-color@8.1.1)
@@ -7535,7 +7535,7 @@ snapshots:
       '@eslint-community/regexpp': 4.12.2
       '@eslint/config-array': 0.19.2(supports-color@8.1.1)
       '@eslint/core': 0.9.1
-      '@eslint/eslintrc': 3.2.0(supports-color@8.1.1)
+      '@eslint/eslintrc': 3.3.7(supports-color@8.1.1)
       '@eslint/js': 9.17.0
       '@eslint/plugin-kit': 0.2.8
       '@humanfs/node': 0.16.8
