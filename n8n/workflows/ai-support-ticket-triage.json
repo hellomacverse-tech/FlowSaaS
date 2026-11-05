@@ -11,7 +11,7 @@
         -140
       ],
       "parameters": {
-        "content": "FlowSaaS v1.0.0 — setup guide: https://flowsaas.com/workflows/ai-support-ticket-triage\n\nConnect your own credentials in each node marked with a warning icon. No credentials are included in this file.",
+        "content": "FlowSaaS v1.0.0 — setup guide: http://localhost:3000/workflows/ai-support-ticket-triage\n\nConnect your own credentials in each node marked with a warning icon. No credentials are included in this file.",
         "height": 100,
         "width": 460
       }

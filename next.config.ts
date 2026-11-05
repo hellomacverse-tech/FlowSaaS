@@ -11,11 +11,12 @@ const CSP = [
   "base-uri 'self'",
   "frame-ancestors 'none'",
   "object-src 'none'",
-  "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com https://us-assets.i.posthog.com",
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://us-assets.i.posthog.com",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src 'self' https://fonts.gstatic.com",
   "img-src 'self' data: blob: https://*.supabase.co",
-  "connect-src 'self' https://*.supabase.co https://api.stripe.com https://challenges.cloudflare.com https://us.i.posthog.com https://us-assets.i.posthog.com",
+  // এখানে connect-src এর ভেতরে 'data:' যুক্ত করে দেওয়া হলো
+  "connect-src 'self' data: https://*.supabase.co https://api.stripe.com https://challenges.cloudflare.com https://us.i.posthog.com https://us-assets.i.posthog.com",
   "frame-src 'self' https://challenges.cloudflare.com https://js.stripe.com https://www.youtube-nocookie.com",
   "form-action 'self'",
 ].join("; ");
